@@ -114,7 +114,7 @@ public class Game {
                 if (nextNextFrame.isStrike()) {
                     bonus += 10;
                 } else {
-                    bonus += nextFrame.getFirstRoll();
+                    bonus += nextNextFrame.getFirstRoll();
                 }
             } else {
                 if (nextFrame.getSecondRoll() == 10) {

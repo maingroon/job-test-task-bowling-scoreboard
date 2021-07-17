@@ -131,4 +131,72 @@ class TestGame {
         assertThrows(BowlingException.class, () -> game.makePoll(3));
     }
 
+    @Test
+    void testValidGameScore2() throws BowlingException {
+        var game = new Game();
+        game.makePoll(10);
+        game.makePoll(8);
+        game.makePoll(2);
+        game.makePoll(9);
+        game.makePoll(1);
+        game.makePoll(8);
+        game.makePoll(0);
+        game.makePoll(10);
+        game.makePoll(10);
+        game.makePoll(9);
+        game.makePoll(1);
+        game.makePoll(9);
+        game.makePoll(1);
+        game.makePoll(10);
+        game.makePoll(10);
+        game.makePoll(9);
+        game.makePoll(1);
+
+        assertEquals(202, game.getFullScore());
+    }
+
+    @Test
+    void testValidGameScore3() throws BowlingException {
+        var game = new Game();
+        game.makePoll(7);
+        game.makePoll(3);
+        game.makePoll(10);
+        game.makePoll(10);
+        game.makePoll(8);
+        game.makePoll(1);
+        game.makePoll(9);
+        game.makePoll(1);
+        game.makePoll(8);
+        game.makePoll(1);
+        game.makePoll(10);
+        game.makePoll(9);
+        game.makePoll(1);
+        game.makePoll(8);
+        game.makePoll(2);
+        game.makePoll(6);
+        game.makePoll(1);
+
+        assertEquals(164, game.getFullScore());
+    }
+
+    @Test
+    void testValidGameScore4() throws BowlingException {
+        var game = new Game();
+        game.makePoll(10);
+        game.makePoll(10);
+        game.makePoll(10);
+        game.makePoll(10);
+        game.makePoll(10);
+        game.makePoll(10);
+        game.makePoll(10);
+        game.makePoll(10);
+        game.makePoll(6);
+        game.makePoll(4);
+        game.makePoll(10);
+        game.makePoll(10);
+        game.makePoll(10);
+
+        assertEquals(276, game.getFullScore());
+    }
+
 }
