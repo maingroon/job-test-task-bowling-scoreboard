@@ -24,10 +24,6 @@ public class Game {
         fullScore = 0;
     }
 
-    public Frame getFrame(int index) {
-        return frames[index];
-    }
-
     public void makePoll(int score) throws BowlingException {
         switch (frames[currentFrameIndex].getRollNumber()) {
             case 1:
