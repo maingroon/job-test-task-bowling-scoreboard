@@ -40,7 +40,7 @@ class TestGame {
 
     @Test
     void testVerifiedGameScore() {
-        assertEquals(167, verifiedGame.getFullScore());
+        assertEquals(167, verifiedGame.getFrames()[10].getScore());
     }
 
     @Test
@@ -90,7 +90,7 @@ class TestGame {
         game.makePoll(10);
         game.makePoll(10);
 
-        assertEquals(300, game.getFullScore());
+        assertEquals(300, game.getFrames()[10].getScore());
     }
 
     @Test
@@ -152,7 +152,7 @@ class TestGame {
         game.makePoll(9);
         game.makePoll(1);
 
-        assertEquals(202, game.getFullScore());
+        assertEquals(202, game.getFrames()[10].getScore());
     }
 
     @Test
@@ -176,7 +176,7 @@ class TestGame {
         game.makePoll(6);
         game.makePoll(1);
 
-        assertEquals(164, game.getFullScore());
+        assertEquals(164, game.getFrames()[10].getScore());
     }
 
     @Test
@@ -196,7 +196,7 @@ class TestGame {
         game.makePoll(10);
         game.makePoll(10);
 
-        assertEquals(276, game.getFullScore());
+        assertEquals(276, game.getFrames()[10].getScore());
     }
 
 }
