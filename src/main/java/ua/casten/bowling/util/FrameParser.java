@@ -1,4 +1,4 @@
-package ua.casten.bowling.service;
+package ua.casten.bowling.util;
 
 import ua.casten.bowling.model.Frame;
 import ua.casten.bowling.model.ViewFrame;

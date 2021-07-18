@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import ua.casten.bowling.exception.BowlingException;
 import ua.casten.bowling.model.Game;
 import ua.casten.bowling.model.ViewFrame;
+import ua.casten.bowling.util.FrameParser;
 
 @Service
 public class BowlingServiceImpl implements BowlingService {
