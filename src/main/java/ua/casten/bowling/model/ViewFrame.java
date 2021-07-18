@@ -19,4 +19,5 @@ public class ViewFrame {
         this.score = score;
         this.inGame = inGame;
     }
+
 }

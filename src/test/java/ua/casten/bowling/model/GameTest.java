@@ -5,11 +5,11 @@ import ua.casten.bowling.exception.BowlingException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TestGame {
+class GameTest {
 
     private final Game verifiedGame = new Game();
 
-    TestGame() throws BowlingException {
+    GameTest() throws BowlingException {
         fillVerifiedGame();
     }
 

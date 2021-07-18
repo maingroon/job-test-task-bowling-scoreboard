@@ -61,8 +61,6 @@
     <orderEntry type="library" name="Maven: org.springframework:spring-aop:5.3.8" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-context:5.3.8" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-expression:5.3.8" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework.session:spring-session-core:2.5.1" level="project" />
-    <orderEntry type="library" name="Maven: org.springframework:spring-jcl:5.3.8" level="project" />
     <orderEntry type="library" name="Maven: org.projectlombok:lombok:1.18.20" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework.boot:spring-boot-starter-test:2.5.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework.boot:spring-boot-test:2.5.2" level="project" />
@@ -91,6 +89,7 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.skyscreamer:jsonassert:1.5.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: com.vaadin.external.google:android-json:0.0.20131108.vaadin1" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-core:5.3.8" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-jcl:5.3.8" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework:spring-test:5.3.8" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.xmlunit:xmlunit-core:2.8.2" level="project" />
   </component>
