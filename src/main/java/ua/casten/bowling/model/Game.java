@@ -12,7 +12,6 @@ public class Game {
     private final Frame[] frames;
     private int currentFrameIndex;
     private boolean isFinished;
-    private int fullScore;
 
     public Game() {
         currentFrameIndex = 1;
@@ -21,10 +20,10 @@ public class Game {
             frames[i] = new Frame();
         }
         isFinished = false;
-        fullScore = 0;
     }
 
     public void makePoll(int score) throws BowlingException {
+        frames[currentFrameIndex].setInGame(true);
         switch (frames[currentFrameIndex].getRollNumber()) {
             case 1:
                 makeFirstPoll(score);
@@ -38,7 +37,6 @@ public class Game {
             default:
                 throw new BowlingRuntimeException("Incorrect roll number in current frame.");
         }
-        frames[currentFrameIndex].setInGame(true);
         updateFramesBonus();
         updateFramesScore();
     }
@@ -49,9 +47,8 @@ public class Game {
 
         if (score == 10 && currentFrameIndex != 10) {
             currentFrameIndex++;
-        } else {
-            frame.setRollNumber(2);
         }
+        frame.setRollNumber(2);
     }
 
     private void makeSecondPoll(int score) throws BowlingException {
@@ -65,12 +62,12 @@ public class Game {
 
         if (currentFrameIndex != 10) {
             currentFrameIndex++;
-        } else if (frame.isStrike() || frame.isSpare()) {
-            frame.setRollNumber(3);
-        } else {
+        } else if (!(frame.isSpare() || frame.isStrike())) {
             finishGame();
         }
+        frame.setRollNumber(3);
     }
+
 
     private void makeThirdPoll(int score) throws BowlingException {
         var frame = frames[currentFrameIndex];
@@ -80,6 +77,7 @@ public class Game {
         }
 
         frame.setThirdRoll(score);
+        frame.setRollNumber(4);
         isFinished = true;
     }
     private void updateFramesBonus() {
@@ -154,7 +152,6 @@ public class Game {
             scoreSum += frame.getFirstRoll() + frame.getSecondRoll() + frame.getThirdRoll() + frame.getBonus();
             frame.setScore(scoreSum);
         }
-        fullScore = scoreSum;
     }
 
     private void finishGame() {
