@@ -2,8 +2,8 @@ package ua.casten.bowling.service;
 
 import org.springframework.stereotype.Service;
 import ua.casten.bowling.exception.BowlingException;
-import ua.casten.bowling.model.Frame;
 import ua.casten.bowling.model.Game;
+import ua.casten.bowling.model.ViewFrame;
 
 @Service
 public class BowlingServiceImpl implements BowlingService {
@@ -43,8 +43,8 @@ public class BowlingServiceImpl implements BowlingService {
     }
 
     @Override
-    public Frame[] getFrames() {
-        return game.getFrames();
+    public ViewFrame[] getFrames() {
+        return FrameParser.parseFrames(game.getFrames());
     }
 
 }

@@ -1,6 +1,6 @@
 package ua.casten.bowling.service;
 
-import ua.casten.bowling.model.Frame;
+import ua.casten.bowling.model.ViewFrame;
 
 public interface BowlingService {
 
@@ -8,6 +8,6 @@ public interface BowlingService {
 
     String makePoll(String stringScore);
 
-    Frame[] getFrames();
+    ViewFrame[] getFrames();
 
 }
