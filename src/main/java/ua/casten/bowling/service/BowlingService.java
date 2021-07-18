@@ -6,7 +6,7 @@ public interface BowlingService {
 
     void startNewGame();
 
-    String makePoll(String strinsScore);
+    String makePoll(String stringScore);
 
     Frame[] getFrames();
 
