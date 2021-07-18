@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import ua.casten.bowling.model.ViewFrame;
 import ua.casten.bowling.service.BowlingService;
 
 import java.util.Arrays;
@@ -24,8 +25,9 @@ public class BowlingController {
 
     @GetMapping()
     public String getBowlingPage(Model model) {
-        model.addAttribute("regularFrames", Arrays.copyOfRange(bowlingService.getFrames(), 1, 10));
-        model.addAttribute("lastFrame", bowlingService.getFrames()[10]);
+        ViewFrame[] viewFrames = bowlingService.getFrames();
+        model.addAttribute("regularFrames", Arrays.copyOfRange(viewFrames, 0, 9));
+        model.addAttribute("lastFrame", viewFrames[9]);
         return "bowling-scoreboard";
     }
 
