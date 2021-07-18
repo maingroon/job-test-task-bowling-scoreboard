@@ -45,15 +45,31 @@
         </tr>
         </tbody>
     </table>
-
     <br>
 
-    <form class="form-control align-content-center text-center mx-auto" action="#" th:action="@{/bowling}" method="post">
+    <div th:if="${errorMessage != null}" class="mx-auto" style="width: 400px">
+        <p th:text="${errorMessage}" class="alert alert-danger"></p>
+        <br>
+    </div>
+
+    <form class="form-control align-content-center text-center mx-auto" action="#" th:action="@{/bowling}"
+          method="post" th:if="${!isFinished}">
         <label for="score">Enter number of knocked pins.</label>
         <br><br>
         <input id="score" class="input-group" type="text" th:name="score">
         <br>
         <button class="btn btn-secondary" type="submit">Submit</button>
+    </form>
+    <br>
+
+    <div th:if="${isFinished == true}" class="mx-auto alert alert-success" style="width: 400px">
+        <h2>Game Finished</h2>
+        <h2 th:text="'Your score: ' + ${lastFrame.score}"></h2>
+    </div>
+
+    <form class="align-content-center text-center mx-auto" action="#" th:action="@{/bowling/restart}"
+          method="post">
+        <button class="btn btn-secondary" type="submit">Start new game</button>
     </form>
 </div>
 

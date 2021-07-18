@@ -10,4 +10,6 @@ public interface BowlingService {
 
     ViewFrame[] getFrames();
 
+    boolean isFinished();
+
 }

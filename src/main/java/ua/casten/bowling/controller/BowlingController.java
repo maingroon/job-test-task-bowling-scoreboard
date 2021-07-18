@@ -3,6 +3,8 @@ package ua.casten.bowling.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,17 +26,35 @@ public class BowlingController {
     }
 
     @GetMapping()
-    public String getBowlingPage(Model model) {
-        ViewFrame[] viewFrames = bowlingService.getFrames();
-        model.addAttribute("regularFrames", Arrays.copyOfRange(viewFrames, 0, 9));
-        model.addAttribute("lastFrame", viewFrames[9]);
+    public String getBowlingPage(Model model, String errorMessage) {
+        addAttributesToModel(model);
+        model.addAttribute("errorMessage", errorMessage);
         return "bowling-scoreboard";
     }
 
     @PostMapping()
-    public String confirmScore(@RequestParam("score") String score) {
-        bowlingService.makePoll(score);
+    public String confirmScore(@RequestParam("score") String score,
+                               Model model) {
+        String errorMessage = bowlingService.makePoll(score);
+
+        if (!errorMessage.isEmpty()) {
+            return getBowlingPage(model, errorMessage);
+        }
+
         return "redirect:/bowling";
+    }
+
+    @PostMapping("/restart")
+    public String restartGame() {
+        bowlingService.startNewGame();
+        return "redirect:/bowling";
+    }
+
+    private void addAttributesToModel(Model model) {
+        ViewFrame[] viewFrames = bowlingService.getFrames();
+        model.addAttribute("regularFrames", Arrays.copyOfRange(viewFrames, 0, 9));
+        model.addAttribute("lastFrame", viewFrames[9]);
+        model.addAttribute("isFinished", bowlingService.isFinished());
     }
 
 }

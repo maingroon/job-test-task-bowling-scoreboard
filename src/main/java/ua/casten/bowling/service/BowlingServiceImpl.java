@@ -48,4 +48,8 @@ public class BowlingServiceImpl implements BowlingService {
         return FrameParser.parseFrames(game.getFrames());
     }
 
+    public boolean isFinished() {
+        return game.isFinished();
+    }
+
 }
