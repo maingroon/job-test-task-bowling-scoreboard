@@ -13,65 +13,47 @@
     <table class="table table-bordered">
         <thead>
         <tr>
-            <th class="col" colspan="2">1</th>
-            <th class="col" colspan="2">2</th>
-            <th class="col" colspan="2">3</th>
-            <th class="col" colspan="2">4</th>
-            <th class="col" colspan="2">5</th>
-            <th class="col" colspan="2">6</th>
-            <th class="col" colspan="2">7</th>
-            <th class="col" colspan="2">8</th>
-            <th class="col" colspan="2">9</th>
-            <th class="col" colspan="3">10</th>
+            <th class="col-lg-24" colspan="2">1</th>
+            <th class="col-lg-24" colspan="2">2</th>
+            <th class="col-lg-24" colspan="2">3</th>
+            <th class="col-lg-24" colspan="2">4</th>
+            <th class="col-lg-24" colspan="2">5</th>
+            <th class="col-lg-24" colspan="2">6</th>
+            <th class="col-lg-24" colspan="2">7</th>
+            <th class="col-lg-24" colspan="2">8</th>
+            <th class="col-lg-24" colspan="2">9</th>
+            <th class="col-lg-24" colspan="3">10</th>
+            <th class="col-lg-24" colspan="3">Score</th>
         </tr>
         </thead>
         <tbody>
         <tr>
-            <th class="col-lg-21">&nbsp;</th>
-            <th class="col-lg-21">&nbsp;</th>
-            <th class="col-lg-21">&nbsp;</th>
-            <th class="col-lg-21">&nbsp;</th>
-            <th class="col-lg-21">&nbsp;</th>
-            <th class="col-lg-21">&nbsp;</th>
-            <th class="col-lg-21">&nbsp;</th>
-            <th class="col-lg-21">&nbsp;</th>
-            <th class="col-lg-21">&nbsp;</th>
-            <th class="col-lg-21">&nbsp;</th>
-            <th class="col-lg-21">&nbsp;</th>
-            <th class="col-lg-21">&nbsp;</th>
-            <th class="col-lg-21">&nbsp;</th>
-            <th class="col-lg-21">&nbsp;</th>
-            <th class="col-lg-21">&nbsp;</th>
-            <th class="col-lg-21">&nbsp;</th>
-            <th class="col-lg-21">&nbsp;</th>
-            <th class="col-lg-21">&nbsp;</th>
-            <th class="col-lg-21">&nbsp;</th>
-            <th class="col-lg-21">&nbsp;</th>
-            <th class="col-lg-21">&nbsp;</th>
+            <th:block th:each="frame : ${regularFrames}">
+                <th class="col-lg-24" th:text="${frame.firstRoll.isEmpty() ? '&nbsp;' : frame.firstRoll}">&nbsp;</th>
+                <th class="col-lg-24" th:text="${frame.secondRoll.isEmpty() ? '&nbsp;' : frame.secondRoll}">&nbsp;</th>
+            </th:block>
+
+            <th class="col-lg-24" th:text="${lastFrame.firstRoll.isEmpty() ? '&nbsp;' : lastFrame.firstRoll}">&nbsp;</th>
+            <th class="col-lg-24" th:text="${lastFrame.secondRoll.isEmpty() ? '&nbsp;' : lastFrame.secondRoll}">&nbsp;</th>
+            <th class="col-lg-24" th:text="${lastFrame.thirdRoll.isEmpty() ? '&nbsp;' : lastFrame.thirdRoll}">&nbsp;</th>
+            <th class="col-lg-24" rowspan="2" colspan="3" th:text="${lastFrame.score}">0</th>
         </tr>
         <tr>
-            <th colspan="2">&nbsp;</th>
-            <th colspan="2">&nbsp;</th>
-            <th colspan="2">&nbsp;</th>
-            <th colspan="2">&nbsp;</th>
-            <th colspan="2">&nbsp;</th>
-            <th colspan="2">&nbsp;</th>
-            <th colspan="2">&nbsp;</th>
-            <th colspan="2">&nbsp;</th>
-            <th colspan="2">&nbsp;</th>
-            <th colspan="3">&nbsp;</th>
+            <th class="col-lg-24" th:each="frame:${regularFrames}"
+                th:text="${frame.inGame ? frame.score : '&nbsp;'}" colspan="2">&nbsp;</th>
+            <th class="col-lg-24"  th:text="${lastFrame.inGame ? lastFrame.score : '&nbsp;'}" colspan="3">&nbsp;</th>
         </tr>
         </tbody>
     </table>
 
     <br>
 
-    <form class="form-control align-content-center text-center mx-auto" action="">
-        <label for="pin_input">Enter number of knocked pins.</label>
+    <form class="form-control align-content-center text-center mx-auto" action="#" th:action="@{/bowling}" method="post">
+        <label for="score">Enter number of knocked pins.</label>
         <br><br>
-        <input id="pin_input" class="input-group" type="text">
+        <input id="score" class="input-group" type="text" th:name="score">
         <br>
-        <input class="btn btn-secondary" type="submit">
+        <button class="btn btn-secondary" type="submit">Submit</button>
     </form>
 </div>
 
