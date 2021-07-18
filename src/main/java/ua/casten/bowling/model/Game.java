@@ -107,22 +107,32 @@ public class Game {
             bonus = 10;
 
             if (index != 9) {
-                var nextNextFrame = frames[index + 2];
-
-                if (nextNextFrame.isStrike()) {
-                    bonus += 10;
-                } else {
-                    bonus += nextNextFrame.getFirstRoll();
-                }
+                bonus = getRegularNextStrikeBonus(frames[index + 2], bonus);
             } else {
-                if (nextFrame.getSecondRoll() == 10) {
-                    bonus += 10;
-                } else {
-                    bonus += nextFrame.getSecondRoll();
-                }
+                bonus = getPrevLastNextStrikeBonus(nextFrame, bonus);
             }
         } else {
             bonus = nextFrame.getFirstRoll() + nextFrame.getSecondRoll();
+        }
+
+        return bonus;
+    }
+
+    private int getRegularNextStrikeBonus(Frame nextNextFrame, int bonus) {
+        if (nextNextFrame.isStrike()) {
+            bonus += 10;
+        } else {
+            bonus += nextNextFrame.getFirstRoll();
+        }
+
+        return bonus;
+    }
+
+    private int getPrevLastNextStrikeBonus(Frame nextFrame, int bonus) {
+        if (nextFrame.getSecondRoll() == 10) {
+            bonus += 10;
+        } else {
+            bonus += nextFrame.getSecondRoll();
         }
 
         return bonus;
