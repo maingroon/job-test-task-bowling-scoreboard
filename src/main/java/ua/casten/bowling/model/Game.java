@@ -73,7 +73,7 @@ public class Game {
         var frame = frames[currentFrameIndex];
 
         if (frame.isStrike() && frame.getSecondRoll() != 10 && frame.getSecondRoll() + score > 10) {
-            throw new BowlingException("Sum of second and third poll cannot be greater than 10 without second strike.");
+            throw new BowlingException("Sum of second and third poll cannot be greater than 10 without second strike");
         }
 
         frame.setThirdRoll(score);

@@ -27,7 +27,7 @@ public class BowlingServiceImpl implements BowlingService {
         try {
             intScore = Integer.parseInt(stringScore.trim());
         } catch (NumberFormatException e) {
-            return "Enter valid score (without symbols and spaces).";
+            return "Enter valid score (without symbols and spaces)";
         }
 
         if (intScore < 0 || intScore > 10) {
