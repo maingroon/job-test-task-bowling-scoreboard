@@ -2,6 +2,7 @@ package ua.casten.bowling.model;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -17,8 +18,9 @@ public class Game {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int id;
 
+    @Setter
     @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)
-    private final List<Frame> frames = new ArrayList<>(10);
+    private List<Frame> frames = new ArrayList<>(10);
 
     @Column(name = "current_frame_index", nullable = false)
     private int currentFrameIndex;
@@ -29,7 +31,9 @@ public class Game {
     public Game() {
         currentFrameIndex = 0;
         for (var i = 0; i < 10; i++) {
-            frames.add(new Frame());
+            var frame = new Frame();
+            frame.setNumber(i);
+            frames.add(frame);
         }
         isFinished = false;
     }

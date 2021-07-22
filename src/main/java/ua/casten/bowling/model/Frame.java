@@ -23,6 +23,9 @@ public class Frame {
     @Setter(AccessLevel.NONE)
     private static final int MAX_SCORE = 10;
 
+    @Column(name = "number", nullable = false)
+    private int number;
+
     @Column(name = "first_roll", nullable = false)
     private int firstRoll;
 
