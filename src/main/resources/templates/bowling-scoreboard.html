@@ -6,7 +6,8 @@
     <title>Bowling Scoreboard</title>
     <link th:href="@{bootstrap.css}" rel="stylesheet">
     <link th:href="@{icon.png}" rel="icon">
-</head><body>
+</head>
+<body>
 
 <div class="container text-center">
     <div class="mt-5 mb-5"><h1>Bowling Scoreboard</h1></div>
@@ -54,7 +55,7 @@
         <br>
     </div>
 
-    <form class="form-control align-content-center text-center mx-auto" action="#" th:action="@{/bowling}"
+    <form class="form-control align-content-center text-center mx-auto" action="#" th:action="@{|/bowling/${gameId}|}"
           method="post" th:if="${!isFinished}">
         <label for="score">Enter number of knocked pins.</label>
         <br><br>
@@ -69,7 +70,7 @@
         <h2 th:text="'Your score: ' + ${lastFrame.score}"></h2>
     </div>
 
-    <form class="align-content-center text-center mx-auto" action="#" th:action="@{/bowling/restart}"
+    <form class="align-content-center text-center mx-auto" action="#" th:action="@{/bowling/new}"
           method="post">
         <button class="btn btn-secondary" type="submit">Start new game</button>
     </form>
