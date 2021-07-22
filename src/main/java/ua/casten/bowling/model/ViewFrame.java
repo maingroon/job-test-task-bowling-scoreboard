@@ -10,7 +10,7 @@ public class ViewFrame {
     private final String thirdRoll;
     private final int score;
 
-    private boolean inGame;
+    private final boolean inGame;
 
     public ViewFrame(String firstRoll, String secondRoll, String thirdRoll, int score, boolean inGame) {
         this.firstRoll = firstRoll;

@@ -15,10 +15,10 @@ public class FrameParser {
 
     public static ViewFrame[] parseFrames(Frame[] frames) {
         ViewFrame[] viewFrames = new ViewFrame[10];
-        for (var i = 1; i < 10; i++) {
-            viewFrames[i - 1] = parseFrame(frames[i]);
+        for (var i = 0; i < 9; i++) {
+            viewFrames[i] = parseFrame(frames[i]);
         }
-        viewFrames[9] = parseLastFrame(frames[10]);
+        viewFrames[9] = parseLastFrame(frames[9]);
         return viewFrames;
     }
 
