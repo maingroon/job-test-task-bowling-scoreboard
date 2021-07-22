@@ -4,6 +4,9 @@ import org.junit.jupiter.api.Test;
 import ua.casten.bowling.model.Frame;
 import ua.casten.bowling.model.ViewFrame;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -12,10 +15,10 @@ class FrameParserTest {
 
     @Test
     void testStrikeOnRegularFrame() {
-        Frame[] frames = createFrameArrayFilledNewFrames();
-        frames[1].setFirstRoll(10);
-        frames[1].setRollNumber(2);
-        frames[1].setInGame(true);
+        List<Frame> frames = createFrameArrayFilledNewFrames();
+        frames.get(0).setFirstRoll(10);
+        frames.get(0).setRollNumber(2);
+        frames.get(0).setInGame(true);
         ViewFrame[] viewFrames = FrameParser.parseFrames(frames);
 
         assertEquals("", viewFrames[0].getFirstRoll());
@@ -24,11 +27,11 @@ class FrameParserTest {
 
     @Test
     void testSpareOnRegularFrame() {
-        Frame[] frames = createFrameArrayFilledNewFrames();
-        frames[1].setFirstRoll(4);
-        frames[1].setSecondRoll(6);
-        frames[1].setRollNumber(3);
-        frames[1].setInGame(true);
+        List<Frame> frames = createFrameArrayFilledNewFrames();
+        frames.get(0).setFirstRoll(4);
+        frames.get(0).setSecondRoll(6);
+        frames.get(0).setRollNumber(3);
+        frames.get(0).setInGame(true);
         ViewFrame[] viewFrames = FrameParser.parseFrames(frames);
 
         assertEquals("4", viewFrames[0].getFirstRoll());
@@ -37,22 +40,22 @@ class FrameParserTest {
 
     @Test
     void testMissOnRegularFrame() {
-        Frame[] frames = createFrameArrayFilledNewFrames();
-        frames[1].setFirstRoll(0);
-        frames[1].setSecondRoll(0);
-        frames[1].setRollNumber(3);
-        frames[1].setInGame(true);
-        frames[2].setFirstRoll(0);
-        frames[2].setSecondRoll(5);
-        frames[2].setRollNumber(3);
-        frames[2].setInGame(true);
-        frames[3].setFirstRoll(6);
-        frames[3].setSecondRoll(0);
-        frames[3].setRollNumber(3);
-        frames[3].setInGame(true);
-        frames[4].setFirstRoll(7);
-        frames[4].setRollNumber(2);
-        frames[4].setInGame(true);
+        List<Frame> frames = createFrameArrayFilledNewFrames();
+        frames.get(0).setFirstRoll(0);
+        frames.get(0).setSecondRoll(0);
+        frames.get(0).setRollNumber(3);
+        frames.get(0).setInGame(true);
+        frames.get(1).setFirstRoll(0);
+        frames.get(1).setSecondRoll(5);
+        frames.get(1).setRollNumber(3);
+        frames.get(1).setInGame(true);
+        frames.get(2).setFirstRoll(6);
+        frames.get(2).setSecondRoll(0);
+        frames.get(2).setRollNumber(3);
+        frames.get(2).setInGame(true);
+        frames.get(3).setFirstRoll(7);
+        frames.get(3).setRollNumber(2);
+        frames.get(3).setInGame(true);
         ViewFrame[] viewFrames = FrameParser.parseFrames(frames);
 
         assertEquals("-", viewFrames[0].getFirstRoll());
@@ -67,14 +70,14 @@ class FrameParserTest {
 
     @Test
     void testScoreRollOnRegularFrame() {
-        Frame[] frames = createFrameArrayFilledNewFrames();
-        frames[1].setFirstRoll(4);
-        frames[1].setSecondRoll(2);
-        frames[1].setRollNumber(3);
-        frames[1].setInGame(true);
-        frames[2].setFirstRoll(4);
-        frames[2].setRollNumber(2);
-        frames[2].setInGame(true);
+        List<Frame> frames = createFrameArrayFilledNewFrames();
+        frames.get(0).setFirstRoll(4);
+        frames.get(0).setSecondRoll(2);
+        frames.get(0).setRollNumber(3);
+        frames.get(0).setInGame(true);
+        frames.get(1).setFirstRoll(4);
+        frames.get(1).setRollNumber(2);
+        frames.get(1).setInGame(true);
         ViewFrame[] viewFrames = FrameParser.parseFrames(frames);
 
         assertEquals("4", viewFrames[0].getFirstRoll());
@@ -93,32 +96,32 @@ class FrameParserTest {
 
     @Test
     void testStrikeRollOnLastFrame() {
-        Frame[] frames = createFrameArrayFilledNewFrames();
-        frames[10].setFirstRoll(10);
-        frames[10].setSecondRoll(10);
-        frames[10].setThirdRoll(10);
-        frames[10].setRollNumber(4);
-        frames[10].setInGame(true);
+        List<Frame> frames = createFrameArrayFilledNewFrames();
+        frames.get(9).setFirstRoll(10);
+        frames.get(9).setSecondRoll(10);
+        frames.get(9).setThirdRoll(10);
+        frames.get(9).setRollNumber(4);
+        frames.get(9).setInGame(true);
         ViewFrame[] viewFrames = FrameParser.parseFrames(frames);
 
         assertEquals("X", viewFrames[9].getFirstRoll());
         assertEquals("X", viewFrames[9].getSecondRoll());
         assertEquals("X", viewFrames[9].getThirdRoll());
 
-        frames[10].setFirstRoll(10);
-        frames[10].setSecondRoll(4);
-        frames[10].setThirdRoll(4);
-        frames[10].setRollNumber(4);
+        frames.get(9).setFirstRoll(10);
+        frames.get(9).setSecondRoll(4);
+        frames.get(9).setThirdRoll(4);
+        frames.get(9).setRollNumber(4);
         viewFrames = FrameParser.parseFrames(frames);
 
         assertEquals("X", viewFrames[9].getFirstRoll());
         assertEquals("4", viewFrames[9].getSecondRoll());
         assertEquals("4", viewFrames[9].getThirdRoll());
 
-        frames[10].setFirstRoll(10);
-        frames[10].setSecondRoll(10);
-        frames[10].setThirdRoll(4);
-        frames[10].setRollNumber(4);
+        frames.get(9).setFirstRoll(10);
+        frames.get(9).setSecondRoll(10);
+        frames.get(9).setThirdRoll(4);
+        frames.get(9).setRollNumber(4);
         viewFrames = FrameParser.parseFrames(frames);
 
         assertEquals("X", viewFrames[9].getFirstRoll());
@@ -128,21 +131,21 @@ class FrameParserTest {
 
     @Test
     void testSpareRollOnLastFrame() {
-        Frame[] frames = createFrameArrayFilledNewFrames();
-        frames[10].setFirstRoll(10);
-        frames[10].setSecondRoll(6);
-        frames[10].setThirdRoll(4);
-        frames[10].setRollNumber(4);
-        frames[10].setInGame(true);
+        List<Frame> frames = createFrameArrayFilledNewFrames();
+        frames.get(9).setFirstRoll(10);
+        frames.get(9).setSecondRoll(6);
+        frames.get(9).setThirdRoll(4);
+        frames.get(9).setRollNumber(4);
+        frames.get(9).setInGame(true);
         ViewFrame[] viewFrames = FrameParser.parseFrames(frames);
 
         assertEquals("X", viewFrames[9].getFirstRoll());
         assertEquals("6", viewFrames[9].getSecondRoll());
         assertEquals("/", viewFrames[9].getThirdRoll());
 
-        frames[10].setFirstRoll(3);
-        frames[10].setSecondRoll(7);
-        frames[10].setThirdRoll(3);
+        frames.get(9).setFirstRoll(3);
+        frames.get(9).setSecondRoll(7);
+        frames.get(9).setThirdRoll(3);
         viewFrames = FrameParser.parseFrames(frames);
 
         assertEquals("3", viewFrames[9].getFirstRoll());
@@ -152,27 +155,27 @@ class FrameParserTest {
 
     @Test
     void testEmptyRollOnLastFrame() {
-        Frame[] frames = createFrameArrayFilledNewFrames();
-        frames[10].setInGame(false);
+        List<Frame> frames = createFrameArrayFilledNewFrames();
+        frames.get(9).setInGame(false);
         ViewFrame[] viewFrames = FrameParser.parseFrames(frames);
 
         assertEquals("", viewFrames[9].getFirstRoll());
         assertEquals("", viewFrames[9].getSecondRoll());
         assertEquals("", viewFrames[9].getThirdRoll());
 
-        frames[10].setFirstRoll(4);
-        frames[10].setRollNumber(2);
-        frames[10].setInGame(true);
+        frames.get(9).setFirstRoll(4);
+        frames.get(9).setRollNumber(2);
+        frames.get(9).setInGame(true);
         viewFrames = FrameParser.parseFrames(frames);
 
         assertEquals("4", viewFrames[9].getFirstRoll());
         assertEquals("", viewFrames[9].getSecondRoll());
         assertEquals("", viewFrames[9].getThirdRoll());
 
-        frames[10].setFirstRoll(4);
-        frames[10].setSecondRoll(6);
-        frames[10].setRollNumber(3);
-        frames[10].setInGame(true);
+        frames.get(9).setFirstRoll(4);
+        frames.get(9).setSecondRoll(6);
+        frames.get(9).setRollNumber(3);
+        frames.get(9).setInGame(true);
         viewFrames = FrameParser.parseFrames(frames);
 
         assertEquals("4", viewFrames[9].getFirstRoll());
@@ -180,11 +183,11 @@ class FrameParserTest {
         assertEquals("", viewFrames[9].getThirdRoll());
     }
 
-    Frame[] createFrameArrayFilledNewFrames() {
-        Frame[] frames = new Frame[11];
-        IntStream.range(0, 11)
-                .forEach(i -> frames[i] = new Frame());
-
+    List<Frame> createFrameArrayFilledNewFrames() {
+        List<Frame> frames = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            frames.add(new Frame());
+        }
         return frames;
     }
 

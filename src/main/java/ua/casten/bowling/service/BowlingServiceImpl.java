@@ -58,7 +58,7 @@ public class BowlingServiceImpl implements BowlingService {
 
     private void makeRoll(int score) throws BowlingException {
         var currentFrameIndex = currentGame.getCurrentFrameIndex();
-        var frame = currentGame.getFrames()[currentFrameIndex];
+        var frame = currentGame.getFrames().get(currentFrameIndex);
         frame.setInGame(true);
         switch (frame.getRollNumber()) {
             case 1:
@@ -77,7 +77,7 @@ public class BowlingServiceImpl implements BowlingService {
     }
 
     private void makeFirstRoll(int currentFrameIndex, int score) {
-        var frame = currentGame.getFrames()[currentFrameIndex];
+        var frame = currentGame.getFrames().get(currentFrameIndex);
         frame.setFirstRoll(score);
 
         if (score == 10 && currentFrameIndex != 9) {
@@ -87,7 +87,7 @@ public class BowlingServiceImpl implements BowlingService {
     }
 
     private void makeSecondRoll(int currentFrameIndex, int score) throws BowlingException {
-        var frame = currentGame.getFrames()[currentFrameIndex];
+        var frame = currentGame.getFrames().get(currentFrameIndex);
 
         if (frame.getFirstRoll() + score > 10 && !(currentFrameIndex == 9 && frame.isStrike())) {
             throw new BowlingException("Sum of rolls in current frame cannot be greater than 10");
@@ -104,7 +104,7 @@ public class BowlingServiceImpl implements BowlingService {
     }
 
     private void makeThirdRoll(int currentFrameIndex, int score) throws BowlingException {
-        var frame = currentGame.getFrames()[currentFrameIndex];
+        var frame = currentGame.getFrames().get(currentFrameIndex);
 
         if (frame.isStrike() && frame.getSecondRoll() != 10 && frame.getSecondRoll() + score > 10) {
             throw new BowlingException("Sum of second and third rolls cannot be greater than 10 without second strike");
@@ -119,11 +119,11 @@ public class BowlingServiceImpl implements BowlingService {
         var frames = currentGame.getFrames();
 
         IntStream.rangeClosed(0, currentFrameIndex)
-                .forEach(index -> updateFrameBonus(frames[index], index));
+                .forEach(index -> updateFrameBonus(frames.get(index), index));
 
         var scoreSum = 0;
         for (var i = 0; i <= currentFrameIndex; i++) {
-            var frame = frames[i];
+            var frame = frames.get(i);
             scoreSum += frame.getFirstRoll() + frame.getSecondRoll() + frame.getThirdRoll() + frame.getBonus();
             frame.setScore(scoreSum);
         }
@@ -143,14 +143,14 @@ public class BowlingServiceImpl implements BowlingService {
         }
 
         var frames = currentGame.getFrames();
-        var nextFrame = frames[index + 1];
+        var nextFrame = frames.get(index + 1);
         var bonus = 0;
 
         if (nextFrame.isStrike()) {
             bonus = 10;
 
             if (index != 8) {
-                bonus += frames[index + 2].getFirstRoll();
+                bonus += frames.get(index + 2).getFirstRoll();
             } else {
                 bonus += nextFrame.getSecondRoll();
             }
@@ -167,7 +167,7 @@ public class BowlingServiceImpl implements BowlingService {
         }
 
         var frames = currentGame.getFrames();
-        var nextFrame = frames[index + 1];
+        var nextFrame = frames.get(index + 1);
         var bonus = 0;
 
         if (nextFrame.isStrike()) {

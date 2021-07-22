@@ -3,6 +3,8 @@ package ua.casten.bowling.util;
 import ua.casten.bowling.model.Frame;
 import ua.casten.bowling.model.ViewFrame;
 
+import java.util.List;
+
 public class FrameParser {
 
     private static final String STRIKE = "X";
@@ -13,12 +15,12 @@ public class FrameParser {
     private FrameParser() {
     }
 
-    public static ViewFrame[] parseFrames(Frame[] frames) {
+    public static ViewFrame[] parseFrames(List<Frame> frames) {
         ViewFrame[] viewFrames = new ViewFrame[10];
         for (var i = 0; i < 9; i++) {
-            viewFrames[i] = parseFrame(frames[i]);
+            viewFrames[i] = parseFrame(frames.get(i));
         }
-        viewFrames[9] = parseLastFrame(frames[9]);
+        viewFrames[9] = parseLastFrame(frames.get(9));
         return viewFrames;
     }
 
