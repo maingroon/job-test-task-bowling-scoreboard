@@ -4,11 +4,15 @@ import ua.casten.bowling.model.ViewFrame;
 
 public interface BowlingService {
 
-    void startNewGame();
+    int startNewGame();
 
     String makePoll(String stringScore);
 
     ViewFrame[] getFrames();
+
+    void setGameId(int gameId);
+
+    boolean isStarted();
 
     boolean isFinished();
 
