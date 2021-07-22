@@ -2,17 +2,17 @@ package ua.casten.bowling.controller;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import ua.casten.bowling.service.BowlingService;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@WebMvcTest(controllers = BowlingController.class)
+@AutoConfigureMockMvc
 class BowlingControllerTest {
 
     @Autowired
@@ -30,8 +30,7 @@ class BowlingControllerTest {
     @Test
     void testGetBowlingPage() throws Exception {
         mockMvc.perform(get("/bowling"))
-                .andExpect(status().isOk())
-                .andExpect(forwardedUrl("bowling-scoreboard.html"));
+                .andExpect(status().isOk());
     }
 
 }
