@@ -135,9 +135,9 @@ public class BowlingServiceImpl implements BowlingService {
         var scoreSum = 0;
         for (var i = 0; i <= currentFrameIndex; i++) {
             var frame = frames.get(i);
-            frameService.save(frame);
             scoreSum += frame.getFirstRoll() + frame.getSecondRoll() + frame.getThirdRoll() + frame.getBonus();
             frame.setScore(scoreSum);
+            frameService.save(frame);
         }
         gameService.save(currentGame);
     }

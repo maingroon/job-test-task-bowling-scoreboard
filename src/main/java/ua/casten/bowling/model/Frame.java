@@ -42,12 +42,13 @@ public class Frame {
     @JoinColumn(name = "game_id", foreignKey = @ForeignKey(name = "game_fkey"))
     private Game game;
 
-    @Transient
+    @Column(name = "bonus", nullable = false)
     private int bonus;
 
-    @Transient
+    @Column(name = "score", nullable = false)
     private int score;
 
+    @Column(name = "in_game", nullable = false)
     private boolean inGame;
 
     public Frame() {
