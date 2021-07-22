@@ -56,14 +56,6 @@ public class BowlingServiceImpl implements BowlingService {
         return "";
     }
 
-    private Game getCurrentGame() {
-        if (!gameMap.containsKey(gameId)) {
-            throw new BowlingRuntimeException("Incorrect game id.");
-        }
-
-        return gameMap.get(gameId);
-    }
-
     private void makeRoll(int score) throws BowlingException {
         var currentFrameIndex = currentGame.getCurrentFrameIndex();
         var frame = currentGame.getFrames()[currentFrameIndex];
@@ -98,7 +90,7 @@ public class BowlingServiceImpl implements BowlingService {
         var frame = currentGame.getFrames()[currentFrameIndex];
 
         if (frame.getFirstRoll() + score > 10 && !(currentFrameIndex == 9 && frame.isStrike())) {
-            throw new BowlingException("Sum of poll in current frame cannot be greater than 10");
+            throw new BowlingException("Sum of rolls in current frame cannot be greater than 10");
         }
 
         frame.setSecondRoll(score);
@@ -115,7 +107,7 @@ public class BowlingServiceImpl implements BowlingService {
         var frame = currentGame.getFrames()[currentFrameIndex];
 
         if (frame.isStrike() && frame.getSecondRoll() != 10 && frame.getSecondRoll() + score > 10) {
-            throw new BowlingException("Sum of second and third poll cannot be greater than 10 without second strike");
+            throw new BowlingException("Sum of second and third rolls cannot be greater than 10 without second strike");
         }
 
         frame.setThirdRoll(score);
@@ -185,6 +177,14 @@ public class BowlingServiceImpl implements BowlingService {
         }
 
         return bonus;
+    }
+
+    private Game getCurrentGame() {
+        if (!gameMap.containsKey(gameId)) {
+            throw new BowlingRuntimeException("Incorrect game id.");
+        }
+
+        return gameMap.get(gameId);
     }
 
     @Override

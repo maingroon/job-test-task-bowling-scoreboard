@@ -1,6 +1,8 @@
 package ua.casten.bowling.service;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import ua.casten.bowling.exception.BowlingException;
 import ua.casten.bowling.model.ViewFrame;
 
@@ -12,103 +14,266 @@ class BowlingServiceImplTest {
 
     private static final String NUMBER_FORMAT_EXCEPTION_MESSAGE = "Enter valid score (without symbols and spaces)";
     private static final String SCORE_UNBOUNDED_EXCEPTION_MESSAGE = "Score cannot be less than 0 or greater than 10";
-    private static final String SCORE_SUM_EXCEPTION_MESSAGE = "Sum of poll in current frame cannot be greater than 10";
-    private static final String SCORE_LAST_SUM_EXCEPTION_MESSAGE = "Sum of second and third poll cannot be greater than 10 without second strike";
+    private static final String SCORE_SUM_EXCEPTION_MESSAGE = "Sum of rolls in current frame cannot be greater than 10";
+    private static final String SCORE_LAST_SUM_EXCEPTION_MESSAGE = "Sum of second and third rolls cannot be greater " +
+            "than 10 without second strike";
 
     @Test
-    void testInputSymbolsIntoMakePollException() {
-        BowlingServiceImpl bowlingService = new BowlingServiceImpl();
+    void testIsStarted() {
+        BowlingService bowlingService = new BowlingServiceImpl();
+        assertFalse(bowlingService.isStarted());
 
-        assertEquals(NUMBER_FORMAT_EXCEPTION_MESSAGE, bowlingService.makePoll("symbols12"));
-        assertEquals(NUMBER_FORMAT_EXCEPTION_MESSAGE, bowlingService.makePoll("12symbols"));
-        assertEquals(NUMBER_FORMAT_EXCEPTION_MESSAGE, bowlingService.makePoll("  s"));
-        assertEquals(NUMBER_FORMAT_EXCEPTION_MESSAGE, bowlingService.makePoll("^32"));
-        assertEquals(NUMBER_FORMAT_EXCEPTION_MESSAGE, bowlingService.makePoll("fe"));
+        bowlingService.startNewGame();
+        assertTrue(bowlingService.isStarted());
     }
 
     @Test
-    void testInputInvalidScoreException() {
-        BowlingServiceImpl bowlingService = new BowlingServiceImpl();
+    void testIsFinishedOnNewGame() {
+        BowlingService bowlingService = new BowlingServiceImpl();
+        bowlingService.startNewGame();
+        assertFalse(bowlingService.isFinished());
+    }
 
-        assertEquals(SCORE_UNBOUNDED_EXCEPTION_MESSAGE, bowlingService.makePoll("-2"));
-        assertEquals(SCORE_UNBOUNDED_EXCEPTION_MESSAGE, bowlingService.makePoll("-1"));
-        assertEquals(SCORE_UNBOUNDED_EXCEPTION_MESSAGE, bowlingService.makePoll("11"));
-        assertEquals(SCORE_UNBOUNDED_EXCEPTION_MESSAGE, bowlingService.makePoll("12"));
+    @ParameterizedTest
+    @ValueSource(strings = {"", "p2", "1-1", "fd5", "10f", "symbols", "  spaces", "1s"})
+    void testNumberFormatException(String stringScore) {
+        BowlingService bowlingService = new BowlingServiceImpl();
+        bowlingService.startNewGame();
+        assertEquals(NUMBER_FORMAT_EXCEPTION_MESSAGE, bowlingService.makeRoll(stringScore));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"-1", "-2", "-3", "11", "12", "13", "-124", "124"})
+    void testScoreUnboundedException(String stringScore) {
+        BowlingService bowlingService = new BowlingServiceImpl();
+        bowlingService.startNewGame();
+        assertEquals(SCORE_UNBOUNDED_EXCEPTION_MESSAGE, bowlingService.makeRoll(stringScore));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"6", "7", "8", "9", "10"})
+    void testScoreSumException(String stringScore) {
+        BowlingService bowlingService = new BowlingServiceImpl();
+        bowlingService.startNewGame();
+        bowlingService.makeRoll("5");
+        assertEquals(SCORE_SUM_EXCEPTION_MESSAGE, bowlingService.makeRoll(stringScore));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"6", "7", "8", "9", "10"})
+    void testLastSumException(String stringScore) {
+        BowlingService bowlingService = new BowlingServiceImpl();
+        bowlingService.startNewGame();
+        for (int i = 0; i < 10; i++) {
+            bowlingService.makeRoll("10");
+        }
+        bowlingService.makeRoll("5");
+        assertEquals(SCORE_LAST_SUM_EXCEPTION_MESSAGE, bowlingService.makeRoll(stringScore));
     }
 
     @Test
-    void testInputSumOfScoresGreaterThan10() {
-        BowlingServiceImpl bowlingService = new BowlingServiceImpl();
-        bowlingService.makePoll("6");
-
-        assertEquals(SCORE_SUM_EXCEPTION_MESSAGE, bowlingService.makePoll("5"));
-        assertEquals(SCORE_SUM_EXCEPTION_MESSAGE, bowlingService.makePoll("6"));
-        assertEquals(SCORE_SUM_EXCEPTION_MESSAGE, bowlingService.makePoll("10"));
-    }
-
-    @Test
-    void testInputSumOfScoresInLastFrameGreaterThan10() {
-        BowlingServiceImpl bowlingService = new BowlingServiceImpl();
-        bowlingService.makePoll("10");
-        bowlingService.makePoll("10");
-        bowlingService.makePoll("10");
-        bowlingService.makePoll("10");
-        bowlingService.makePoll("10");
-        bowlingService.makePoll("10");
-        bowlingService.makePoll("10");
-        bowlingService.makePoll("10");
-        bowlingService.makePoll("10");
-        bowlingService.makePoll("10");
-        bowlingService.makePoll("7");
-
-        assertEquals(SCORE_LAST_SUM_EXCEPTION_MESSAGE, bowlingService.makePoll("4"));
-        assertEquals(SCORE_LAST_SUM_EXCEPTION_MESSAGE, bowlingService.makePoll("5"));
-        assertEquals(SCORE_LAST_SUM_EXCEPTION_MESSAGE, bowlingService.makePoll("10"));
-    }
-
-    @Test
-    void testInputValidScoresAndIsFinished() {
-        BowlingServiceImpl bowlingService = new BowlingServiceImpl();
-
-        assertEquals("", bowlingService.makePoll("10"));
-        assertEquals("", bowlingService.makePoll("7"));
-        assertEquals("", bowlingService.makePoll("3"));
-        assertEquals("", bowlingService.makePoll("0"));
-        assertEquals("", bowlingService.makePoll("8"));
-        assertEquals("", bowlingService.makePoll("9"));
-        assertEquals("", bowlingService.makePoll("0"));
-        assertEquals("", bowlingService.makePoll("10"));
-        assertEquals("", bowlingService.makePoll("10"));
-        assertEquals("", bowlingService.makePoll("10"));
-        assertEquals("", bowlingService.makePoll("10"));
-        assertEquals("", bowlingService.makePoll("10"));
-        assertEquals("", bowlingService.makePoll("10"));
-        assertEquals("", bowlingService.makePoll("10"));
-        assertEquals("", bowlingService.makePoll("10"));
-
+    void testIsFinished1() {
+        BowlingService bowlingService = new BowlingServiceImpl();
+        bowlingService.startNewGame();
+        for (int i = 0; i < 12; i++) {
+            bowlingService.makeRoll("10");
+        }
         assertTrue(bowlingService.isFinished());
     }
 
     @Test
-    void testGetFramesAndStartNewGame() {
-        BowlingServiceImpl bowlingService = new BowlingServiceImpl();
-        ViewFrame[] viewFrames = bowlingService.getFrames();
-
-        bowlingService.makePoll("10");
-        bowlingService.makePoll("8");
-        bowlingService.makePoll("2");
-        bowlingService.makePoll("5");
-        bowlingService.makePoll("0");
-        bowlingService.makePoll("0");
-        bowlingService.makePoll("6");
-
-        assertFalse(Arrays.equals(bowlingService.getFrames(), viewFrames));
-        assertFalse(bowlingService.isFinished());
-
-        viewFrames = bowlingService.getFrames();
+    void testIsFinished2() {
+        BowlingService bowlingService = new BowlingServiceImpl();
         bowlingService.startNewGame();
+        for (int i = 0; i < 10; i++) {
+            bowlingService.makeRoll("4");
+            bowlingService.makeRoll("6");
+        }
+        bowlingService.makeRoll("3");
+        assertTrue(bowlingService.isFinished());
+    }
 
-        assertFalse(Arrays.equals(bowlingService.getFrames(), viewFrames));
+    @Test
+    void testIsFinished3() {
+        BowlingService bowlingService = new BowlingServiceImpl();
+        bowlingService.startNewGame();
+        for (int i = 0; i < 10; i++) {
+            bowlingService.makeRoll("2");
+            bowlingService.makeRoll("2");
+        }
+        assertTrue(bowlingService.isFinished());
+    }
+
+    @Test
+    void testStrikeScore1() {
+        BowlingService bowlingService = new BowlingServiceImpl();
+        bowlingService.startNewGame();
+        bowlingService.makeRoll("10");
+        bowlingService.makeRoll("5");
+        bowlingService.makeRoll("5");
+
+        var frame = bowlingService.getFrames()[0];
+        assertEquals("", frame.getFirstRoll());
+        assertEquals("X", frame.getSecondRoll());
+        assertEquals(20, frame.getScore());
+    }
+
+    @Test
+    void testStrikeScore2() {
+        BowlingService bowlingService = new BowlingServiceImpl();
+        bowlingService.startNewGame();
+        bowlingService.makeRoll("10");
+        bowlingService.makeRoll("10");
+        bowlingService.makeRoll("10");
+
+        var frame = bowlingService.getFrames()[0];
+        assertEquals("", frame.getFirstRoll());
+        assertEquals("X", frame.getSecondRoll());
+        assertEquals(30, frame.getScore());
+    }
+
+    @Test
+    void testStrikeScore3() {
+        BowlingService bowlingService = new BowlingServiceImpl();
+        bowlingService.startNewGame();
+        bowlingService.makeRoll("10");
+        bowlingService.makeRoll("4");
+        bowlingService.makeRoll("5");
+
+        var frame = bowlingService.getFrames()[0];
+        assertEquals("", frame.getFirstRoll());
+        assertEquals("X", frame.getSecondRoll());
+        assertEquals(19, frame.getScore());
+    }
+
+    @Test
+    void testSpareScore1() {
+        BowlingService bowlingService = new BowlingServiceImpl();
+        bowlingService.startNewGame();
+        bowlingService.makeRoll("6");
+        bowlingService.makeRoll("4");
+        bowlingService.makeRoll("5");
+
+        var frame = bowlingService.getFrames()[0];
+        assertEquals("6", frame.getFirstRoll());
+        assertEquals("/", frame.getSecondRoll());
+        assertEquals(15, frame.getScore());
+    }
+
+    @Test
+    void testSpareScore2() {
+        BowlingService bowlingService = new BowlingServiceImpl();
+        bowlingService.startNewGame();
+        bowlingService.makeRoll("2");
+        bowlingService.makeRoll("8");
+        bowlingService.makeRoll("10");
+
+        var frame = bowlingService.getFrames()[0];
+        assertEquals("2", frame.getFirstRoll());
+        assertEquals("/", frame.getSecondRoll());
+        assertEquals(20, frame.getScore());
+    }
+
+    @Test
+    void testSpareScore3() {
+        BowlingService bowlingService = new BowlingServiceImpl();
+        bowlingService.startNewGame();
+        bowlingService.makeRoll("0");
+        bowlingService.makeRoll("10");
+        bowlingService.makeRoll("5");
+        bowlingService.makeRoll("5");
+
+        var frame = bowlingService.getFrames()[0];
+        assertEquals("-", frame.getFirstRoll());
+        assertEquals("/", frame.getSecondRoll());
+        assertEquals(15, frame.getScore());
+    }
+
+    @Test
+    void testMissScore1() {
+        BowlingService bowlingService = new BowlingServiceImpl();
+        bowlingService.startNewGame();
+        bowlingService.makeRoll("0");
+        bowlingService.makeRoll("0");
+
+        var frame = bowlingService.getFrames()[0];
+        assertEquals("-", frame.getFirstRoll());
+        assertEquals("-", frame.getSecondRoll());
+        assertEquals(0, frame.getScore());
+    }
+
+    @Test
+    void testMissScore2() {
+        BowlingService bowlingService = new BowlingServiceImpl();
+        bowlingService.startNewGame();
+        bowlingService.makeRoll("0");
+        bowlingService.makeRoll("10");
+        bowlingService.makeRoll("7");
+
+        var frame = bowlingService.getFrames()[0];
+        assertEquals("-", frame.getFirstRoll());
+        assertEquals("/", frame.getSecondRoll());
+        assertEquals(17, frame.getScore());
+    }
+
+    @Test
+    void testMissScore3() {
+        BowlingService bowlingService = new BowlingServiceImpl();
+        bowlingService.startNewGame();
+        bowlingService.makeRoll("6");
+        bowlingService.makeRoll("0");
+        bowlingService.makeRoll("5");
+
+        var frame = bowlingService.getFrames()[0];
+        assertEquals("6", frame.getFirstRoll());
+        assertEquals("-", frame.getSecondRoll());
+        assertEquals(6, frame.getScore());
+    }
+
+    @Test
+    void testGreatGameFinalScore() {
+        BowlingService bowlingService = new BowlingServiceImpl();
+        bowlingService.startNewGame();
+        for (int i = 0; i < 12; i++) {
+            bowlingService.makeRoll("10");
+        }
+        assertEquals(300, bowlingService.getFrames()[9].getScore());
+    }
+
+    @Test
+    void testSpareGameFinalScore() {
+        BowlingService bowlingService = new BowlingServiceImpl();
+        bowlingService.startNewGame();
+        for (int i = 0; i < 10; i++) {
+            bowlingService.makeRoll("5");
+            bowlingService.makeRoll("5");
+        }
+        bowlingService.makeRoll("5");
+        assertEquals(150, bowlingService.getFrames()[9].getScore());
+    }
+
+    @Test
+    void testVerifiedGameScore() {
+        BowlingService bowlingService = new BowlingServiceImpl();
+        bowlingService.startNewGame();
+        bowlingService.makeRoll("10");
+        bowlingService.makeRoll("7");
+        bowlingService.makeRoll("3");
+        bowlingService.makeRoll("9");
+        bowlingService.makeRoll("0");
+        bowlingService.makeRoll("10");
+        bowlingService.makeRoll("0");
+        bowlingService.makeRoll("8");
+        bowlingService.makeRoll("8");
+        bowlingService.makeRoll("2");
+        bowlingService.makeRoll("0");
+        bowlingService.makeRoll("6");
+        bowlingService.makeRoll("10");
+        bowlingService.makeRoll("10");
+        bowlingService.makeRoll("10");
+        bowlingService.makeRoll("8");
+        bowlingService.makeRoll("1");
+        assertEquals(167, bowlingService.getFrames()[9].getScore());
     }
 
 }
