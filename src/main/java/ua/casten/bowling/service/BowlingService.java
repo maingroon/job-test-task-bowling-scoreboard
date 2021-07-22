@@ -12,8 +12,6 @@ public interface BowlingService {
 
     void setGameId(int gameId);
 
-    boolean isStarted();
-
     boolean isFinished();
 
 }
