@@ -111,7 +111,6 @@ public class BowlingServiceImpl implements BowlingService {
         frame.setRollNumber(3);
     }
 
-
     private void makeThirdRoll(int currentFrameIndex, int score) throws BowlingException {
         var frame = currentGame.getFrames()[currentFrameIndex];
 
