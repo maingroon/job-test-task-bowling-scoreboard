@@ -29,9 +29,6 @@ public class BowlingController {
     public String getBowlingPage(@PathVariable int gameId,
                                  Model model,
                                  String errorMessage) {
-        if (!bowlingService.isStarted()) {
-            return "redirect:/bowling";
-        }
         bowlingService.setGameId(gameId);
         addAttributesToModel(model);
         model.addAttribute("errorMessage", errorMessage);

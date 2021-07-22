@@ -1,5 +1,6 @@
 package ua.casten.bowling.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.casten.bowling.exception.BowlingException;
 import ua.casten.bowling.exception.BowlingRuntimeException;
@@ -8,8 +9,8 @@ import ua.casten.bowling.model.Game;
 import ua.casten.bowling.model.ViewFrame;
 import ua.casten.bowling.util.FrameParser;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
@@ -17,18 +18,28 @@ public class BowlingServiceImpl implements BowlingService {
 
     private int gameId;
     private Game currentGame;
-    private final Map<Integer, Game> gameMap;
 
-    public BowlingServiceImpl() {
-        gameMap = new HashMap<>();
+    private final GameService gameService;
+    private final FrameService frameService;
+
+    @Autowired
+    public BowlingServiceImpl(GameService gameService, FrameService frameService) {
+        this.gameService = gameService;
+        this.frameService = frameService;
         gameId = -1;
     }
 
     @Override
     public int startNewGame() {
-        gameId = gameMap.size();
         currentGame = new Game();
-        gameMap.put(gameId, currentGame);
+        gameService.save(currentGame);
+        gameId = currentGame.getId();
+
+        currentGame.getFrames()
+                .forEach(frame -> frame.setGame(currentGame));
+
+        currentGame.getFrames()
+                .forEach(frameService::save);
 
         return gameId;
     }
@@ -124,9 +135,11 @@ public class BowlingServiceImpl implements BowlingService {
         var scoreSum = 0;
         for (var i = 0; i <= currentFrameIndex; i++) {
             var frame = frames.get(i);
+            frameService.save(frame);
             scoreSum += frame.getFirstRoll() + frame.getSecondRoll() + frame.getThirdRoll() + frame.getBonus();
             frame.setScore(scoreSum);
         }
+        gameService.save(currentGame);
     }
 
     private void updateFrameBonus(Frame frame, int index) {
@@ -180,11 +193,21 @@ public class BowlingServiceImpl implements BowlingService {
     }
 
     private Game getCurrentGame() {
-        if (!gameMap.containsKey(gameId)) {
-            throw new BowlingRuntimeException("Incorrect game id.");
+        if (currentGame.getId() == gameId) {
+            return currentGame;
         }
 
-        return gameMap.get(gameId);
+        try {
+            Game game = gameService.findById(gameId);
+            game.setFrames(
+                    game.getFrames().stream()
+                            .sorted(Comparator.comparingInt(Frame::getNumber))
+                            .collect(Collectors.toList())
+            );
+            return game;
+        } catch (BowlingException e) {
+            throw new BowlingRuntimeException(e.getMessage());
+        }
     }
 
     @Override
@@ -196,10 +219,6 @@ public class BowlingServiceImpl implements BowlingService {
     public void setGameId(int gameId) {
         this.gameId = gameId;
         currentGame = getCurrentGame();
-    }
-
-    public boolean isStarted() {
-        return !gameMap.isEmpty();
     }
 
     public boolean isFinished() {
