@@ -3,10 +3,7 @@ package ua.casten.bowling.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import ua.casten.bowling.model.ViewFrame;
 import ua.casten.bowling.service.BowlingService;
 
@@ -24,28 +21,40 @@ public class BowlingController {
     }
 
     @GetMapping("")
-    public String getBowlingPage(Model model, String errorMessage) {
+    public String startNewGame() {
+        return "new-game";
+    }
+
+    @GetMapping("/{gameId}")
+    public String getBowlingPage(@PathVariable int gameId,
+                                 Model model,
+                                 String errorMessage) {
+        if (!bowlingService.isStarted()) {
+            return "redirect:/bowling";
+        }
+        bowlingService.setGameId(gameId);
         addAttributesToModel(model);
         model.addAttribute("errorMessage", errorMessage);
         return "bowling-scoreboard";
     }
 
-    @PostMapping()
-    public String confirmScore(@RequestParam("score") String score,
+    @PostMapping("/{gameId}")
+    public String confirmScore(@PathVariable int gameId,
+                               @RequestParam("score") String score,
                                Model model) {
         String errorMessage = bowlingService.makePoll(score);
 
         if (!errorMessage.isEmpty()) {
-            return getBowlingPage(model, errorMessage);
+            return getBowlingPage(gameId, model, errorMessage);
         }
 
-        return "redirect:/bowling";
+        return "redirect:/bowling/" + gameId;
     }
 
-    @PostMapping("/restart")
+    @PostMapping("/new")
     public String restartGame() {
-        bowlingService.startNewGame();
-        return "redirect:/bowling";
+        int gameId = bowlingService.startNewGame();
+        return "redirect:/bowling/" + gameId;
     }
 
     private void addAttributesToModel(Model model) {
