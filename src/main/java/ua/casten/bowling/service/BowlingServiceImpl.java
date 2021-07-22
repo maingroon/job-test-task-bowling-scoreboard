@@ -34,7 +34,7 @@ public class BowlingServiceImpl implements BowlingService {
     }
 
     @Override
-    public String makePoll(String stringScore) {
+    public String makeRoll(String stringScore) {
         int intScore;
 
         try {
@@ -48,7 +48,7 @@ public class BowlingServiceImpl implements BowlingService {
         }
 
         try {
-            makePoll(intScore);
+            makeRoll(intScore);
         } catch (BowlingException e) {
             return e.getMessage();
         }
@@ -64,7 +64,7 @@ public class BowlingServiceImpl implements BowlingService {
         return gameMap.get(gameId);
     }
 
-    private void makePoll(int score) throws BowlingException {
+    private void makeRoll(int score) throws BowlingException {
         var currentFrameIndex = currentGame.getCurrentFrameIndex();
         var frame = currentGame.getFrames()[currentFrameIndex];
         frame.setInGame(true);

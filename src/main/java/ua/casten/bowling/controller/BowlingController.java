@@ -42,7 +42,7 @@ public class BowlingController {
     public String confirmScore(@PathVariable int gameId,
                                @RequestParam("score") String score,
                                Model model) {
-        String errorMessage = bowlingService.makePoll(score);
+        String errorMessage = bowlingService.makeRoll(score);
 
         if (!errorMessage.isEmpty()) {
             return getBowlingPage(gameId, model, errorMessage);
