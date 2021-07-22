@@ -26,7 +26,7 @@ public class BowlingServiceImpl implements BowlingService {
 
     @Override
     public int startNewGame() {
-        gameId++;
+        gameId = gameMap.size();
         currentGame = new Game();
         gameMap.put(gameId, currentGame);
 
