@@ -14,9 +14,9 @@ public class Game {
     private boolean isFinished;
 
     public Game() {
-        currentFrameIndex = 1;
-        frames = new Frame[11]; // Size one more for matching array index and frame number.
-        for (var i = 0; i < 11; i++) {
+        currentFrameIndex = 0;
+        frames = new Frame[10];
+        for (var i = 0; i < 10; i++) {
             frames[i] = new Frame();
         }
         isFinished = false;
@@ -26,41 +26,40 @@ public class Game {
         frames[currentFrameIndex].setInGame(true);
         switch (frames[currentFrameIndex].getRollNumber()) {
             case 1:
-                makeFirstPoll(score);
+                makeFirstRoll(score);
                 break;
             case 2:
-                makeSecondPoll(score);
+                makeSecondRoll(score);
                 break;
             case 3:
-                makeThirdPoll(score);
+                makeThirdRoll(score);
                 break;
             default:
                 throw new BowlingRuntimeException("Incorrect roll number in current frame.");
         }
-        updateFramesBonus();
-        updateFramesScore();
+        updateFramesData();
     }
 
-    private void makeFirstPoll(int score) {
+    private void makeFirstRoll(int score) {
         var frame = frames[currentFrameIndex];
         frame.setFirstRoll(score);
 
-        if (score == 10 && currentFrameIndex != 10) {
+        if (score == 10 && currentFrameIndex != 9) {
             currentFrameIndex++;
         }
         frame.setRollNumber(2);
     }
 
-    private void makeSecondPoll(int score) throws BowlingException {
+    private void makeSecondRoll(int score) throws BowlingException {
         var frame = frames[currentFrameIndex];
 
-        if (frame.getFirstRoll() + score > 10 && !(currentFrameIndex == 10 && frame.isStrike())) {
+        if (frame.getFirstRoll() + score > 10 && !(currentFrameIndex == 9 && frame.isStrike())) {
             throw new BowlingException("Sum of poll in current frame cannot be greater than 10");
         }
 
         frame.setSecondRoll(score);
 
-        if (currentFrameIndex != 10) {
+        if (currentFrameIndex != 9) {
             currentFrameIndex++;
         } else if (!(frame.isSpare() || frame.isStrike())) {
             finishGame();
@@ -69,7 +68,7 @@ public class Game {
     }
 
 
-    private void makeThirdPoll(int score) throws BowlingException {
+    private void makeThirdRoll(int score) throws BowlingException {
         var frame = frames[currentFrameIndex];
 
         if (frame.isStrike() && frame.getSecondRoll() != 10 && frame.getSecondRoll() + score > 10) {
@@ -80,9 +79,17 @@ public class Game {
         frame.setRollNumber(4);
         isFinished = true;
     }
-    private void updateFramesBonus() {
-        IntStream.rangeClosed(1, 10)
+
+    private void updateFramesData() {
+        IntStream.rangeClosed(0, currentFrameIndex)
                 .forEach(this::updateFrameBonus);
+
+        var scoreSum = 0;
+        for (var i = 0; i <= currentFrameIndex; i++) {
+            var frame = frames[i];
+            scoreSum += frame.getFirstRoll() + frame.getSecondRoll() + frame.getThirdRoll() + frame.getBonus();
+            frame.setScore(scoreSum);
+        }
     }
 
     private void updateFrameBonus(int index) {
@@ -96,7 +103,7 @@ public class Game {
     }
 
     private int getStrikeBonus(int index) {
-        if (index == 10) {
+        if (index == 9) {
             return 0;
         }
 
@@ -106,10 +113,10 @@ public class Game {
         if (nextFrame.isStrike()) {
             bonus = 10;
 
-            if (index != 9) {
-                bonus = getRegularNextStrikeBonus(frames[index + 2], bonus);
+            if (index != 8) {
+                bonus += frames[index + 2].getFirstRoll();
             } else {
-                bonus = getPrevLastNextStrikeBonus(nextFrame, bonus);
+                bonus += nextFrame.getSecondRoll();
             }
         } else {
             bonus = nextFrame.getFirstRoll() + nextFrame.getSecondRoll();
@@ -118,28 +125,8 @@ public class Game {
         return bonus;
     }
 
-    private int getRegularNextStrikeBonus(Frame nextNextFrame, int bonus) {
-        if (nextNextFrame.isStrike()) {
-            bonus += 10;
-        } else {
-            bonus += nextNextFrame.getFirstRoll();
-        }
-
-        return bonus;
-    }
-
-    private int getPrevLastNextStrikeBonus(Frame nextFrame, int bonus) {
-        if (nextFrame.getSecondRoll() == 10) {
-            bonus += 10;
-        } else {
-            bonus += nextFrame.getSecondRoll();
-        }
-
-        return bonus;
-    }
-
     private int getSpareBonus(int index) {
-        if (index == 10) {
+        if (index == 9) {
             return 0;
         }
 
@@ -153,15 +140,6 @@ public class Game {
         }
 
         return bonus;
-    }
-
-    private void updateFramesScore() {
-        var scoreSum = 0;
-        for (var i = 1; i < frames.length; i++) {
-            var frame = frames[i];
-            scoreSum += frame.getFirstRoll() + frame.getSecondRoll() + frame.getThirdRoll() + frame.getBonus();
-            frame.setScore(scoreSum);
-        }
     }
 
     private void finishGame() {
