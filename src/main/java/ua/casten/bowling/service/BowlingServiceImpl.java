@@ -7,222 +7,221 @@ import ua.casten.bowling.exception.BowlingRuntimeException;
 import ua.casten.bowling.model.Frame;
 import ua.casten.bowling.model.Game;
 import ua.casten.bowling.model.ViewFrame;
-import ua.casten.bowling.util.FrameParser;
+import ua.casten.bowling.repository.FrameRepository;
+import ua.casten.bowling.repository.GameRepository;
+import ua.casten.bowling.util.BowlingUtil;
 
-import java.util.Comparator;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.List;
 
 @Service
 public class BowlingServiceImpl implements BowlingService {
 
-    private int gameId;
-    private Game currentGame;
-
-    private final GameService gameService;
-    private final FrameService frameService;
+    private final GameRepository gameRepository;
+    private final FrameRepository frameRepository;
 
     @Autowired
-    public BowlingServiceImpl(GameService gameService, FrameService frameService) {
-        this.gameService = gameService;
-        this.frameService = frameService;
-        gameId = -1;
+    public BowlingServiceImpl(GameRepository gameRepository, FrameRepository frameRepository) {
+        this.gameRepository = gameRepository;
+        this.frameRepository = frameRepository;
     }
 
     @Override
     public int startNewGame() {
-        currentGame = new Game();
-        gameService.save(currentGame);
-        gameId = currentGame.getId();
-
-        currentGame.getFrames()
-                .forEach(frame -> frame.setGame(currentGame));
-
-        currentGame.getFrames()
-                .forEach(frameService::save);
-
-        return gameId;
+        return gameRepository.save(new Game()).getId();
     }
 
     @Override
-    public String makeRoll(String stringScore) {
-        int intScore;
+    public void makeRoll(Game game, String stringScore) throws BowlingException {
+        if (game.isFinished()) {
+            throw new BowlingRuntimeException("A new roll cannot be made, the game is over.");
+        }
+
+        var score = validateScore(stringScore);
+        var frame = getCurrentFrame(game);
+
+        if (frame.getNumber() != 10) {
+            makeRegularFrameRoll(frame, score);
+        } else {
+            makeLastFrameRoll(frame, score);
+        }
+
+        updateGameData(game);
+    }
+
+    private int validateScore(String stringScore) throws BowlingException {
+        int score;
 
         try {
-            intScore = Integer.parseInt(stringScore.trim());
+            score = Integer.parseInt(stringScore.trim());
         } catch (NumberFormatException e) {
-            return "Enter valid score (without symbols and spaces)";
+            throw new BowlingException("Enter valid score (without symbols and spaces).");
         }
 
-        if (intScore < 0 || intScore > 10) {
-            return "Score cannot be less than 0 or greater than 10";
+        if (score < 0 || score > 10) {
+            throw new BowlingException("Score cannot be less than 0 or greater than 10.");
         }
 
-        try {
-            makeRoll(intScore);
-        } catch (BowlingException e) {
-            return e.getMessage();
-        }
-
-        return "";
+        return score;
     }
 
-    private void makeRoll(int score) throws BowlingException {
-        var currentFrameIndex = currentGame.getCurrentFrameIndex();
-        var frame = currentGame.getFrames().get(currentFrameIndex);
-        frame.setInGame(true);
-        switch (frame.getRollNumber()) {
-            case 1:
-                makeFirstRoll(currentFrameIndex, score);
-                break;
-            case 2:
-                makeSecondRoll(currentFrameIndex, score);
-                break;
-            case 3:
-                makeThirdRoll(currentFrameIndex, score);
-                break;
-            default:
-                throw new BowlingRuntimeException("Incorrect roll number in current frame.");
+    private Frame getCurrentFrame(Game game) {
+        var frames = BowlingUtil.sortFrames(game.getFrames());
+        Frame frame;
+
+        if (checkCreateNew(frames)) {
+            frame = createNewFrame(frames.size() + 1);
+            frame.setGame(game);
+            game.getFrames().add(frame);
+        } else {
+            frame = frames.get(frames.size() - 1);
         }
-        updateFramesData(currentFrameIndex);
+
+        return frame;
     }
 
-    private void makeFirstRoll(int currentFrameIndex, int score) {
-        var frame = currentGame.getFrames().get(currentFrameIndex);
-        frame.setFirstRoll(score);
-
-        if (score == 10 && currentFrameIndex != 9) {
-            currentGame.increaseCurrentFrameIndex();
+    private boolean checkCreateNew(List<Frame> frames) {
+        if (frames.isEmpty()) {
+            return true;
         }
-        frame.setRollNumber(2);
+
+        if (frames.size() == 10) {
+            return false;
+        }
+
+        var frame = frames.get(frames.size() - 1);
+
+        return frame.getSecondRoll() != null || frame.getFirstRoll() == 10;
     }
 
-    private void makeSecondRoll(int currentFrameIndex, int score) throws BowlingException {
-        var frame = currentGame.getFrames().get(currentFrameIndex);
+    private Frame createNewFrame(int frameNumber) {
+        var frame = new Frame();
+        frame.setNumber(frameNumber);
+        return  frame;
+    }
 
-        if (frame.getFirstRoll() + score > 10 && !(currentFrameIndex == 9 && frame.isStrike())) {
-            throw new BowlingException("Sum of rolls in current frame cannot be greater than 10");
+    private void makeRegularFrameRoll(Frame frame, int score) {
+        if (frame.getFirstRoll() == null) {
+            frame.setFirstRoll(score);
+        } else if (frame.getSecondRoll() == null) {
+            makeSecondRegularFrameRoll(frame, score);
+        } else {
+            throw new BowlingRuntimeException("Cannot roll third time in regular frame.");
         }
+    }
 
+    private void makeSecondRegularFrameRoll(Frame frame, int score) {
+        if (frame.getFirstRoll() + score > 10) {
+            throw new BowlingRuntimeException("Sum of rolls in regular frame cannot be greater than 10");
+        }
         frame.setSecondRoll(score);
-
-        if (currentFrameIndex != 9) {
-            currentGame.increaseCurrentFrameIndex();
-        } else if (!(frame.isSpare() || frame.isStrike())) {
-            currentGame.finishGame();
-        }
-        frame.setRollNumber(3);
     }
 
-    private void makeThirdRoll(int currentFrameIndex, int score) throws BowlingException {
-        var frame = currentGame.getFrames().get(currentFrameIndex);
-
-        if (frame.isStrike() && frame.getSecondRoll() != 10 && frame.getSecondRoll() + score > 10) {
-            throw new BowlingException("Sum of second and third rolls cannot be greater than 10 without second strike");
+    private void makeLastFrameRoll(Frame frame, int score) throws BowlingException {
+        if (frame.getFirstRoll() == null) {
+            frame.setFirstRoll(score);
+        } else if (frame.getSecondRoll() == null) {
+            makeSecondLastFrameRoll(frame, score);
+        } else if (frame.getThirdRoll() == null && (frame.isStrike() || frame.isSpare())) {
+            makeThirdLastFrameRoll(frame, score);
+        } else {
+            throw new BowlingRuntimeException("Cannot roll fourth time in last frame w.");
         }
+    }
 
+    private void makeSecondLastFrameRoll(Frame frame, int score) throws BowlingException {
+        if (frame.getFirstRoll() + score > 10 && frame.getFirstRoll() != 10) {
+            throw new BowlingException("Sum of first and second rolls in last frame cannot be greater than 10 " +
+                    "without strike in first roll.");
+        }
+        frame.setSecondRoll(score);
+        if (!frame.isStrike() && !frame.isSpare()) {
+            frame.getGame().setFinished(true);
+        }
+    }
+
+    private void makeThirdLastFrameRoll(Frame frame, int score) throws BowlingException {
+        if (!frame.isSpare() && frame.getSecondRoll() != 10 && frame.getSecondRoll() + score > 10) {
+            throw new BowlingException("Sum of second and third rolls in last frame cannot be greater than 10 " +
+                    "without second roll strike or spare.");
+        }
         frame.setThirdRoll(score);
-        frame.setRollNumber(4);
-        currentGame.finishGame();
+        frame.getGame().setFinished(true);
     }
 
-    private void updateFramesData(int currentFrameIndex) {
-        var frames = currentGame.getFrames();
+    private void updateGameData(Game game) {
+        var fullScore = 0;
+        var frames = BowlingUtil.sortFrames(game.getFrames());
 
-        IntStream.rangeClosed(0, currentFrameIndex)
-                .forEach(index -> updateFrameBonus(frames.get(index), index));
-
-        var scoreSum = 0;
-        for (var i = 0; i <= currentFrameIndex; i++) {
+        for (int i = 0; i < frames.size(); i++) {
             var frame = frames.get(i);
-            scoreSum += frame.getFirstRoll() + frame.getSecondRoll() + frame.getThirdRoll() + frame.getBonus();
-            frame.setScore(scoreSum);
-            frameService.save(frame);
+            var firstRoll = frame.getFirstRoll() == null ? 0 : frame.getFirstRoll();
+            var secondRoll = frame.getSecondRoll() == null ? 0 : frame.getSecondRoll();
+            var thirdRoll = frame.getThirdRoll() == null ? 0 : frame.getThirdRoll();
+            frame.setBonus(getBonus(i, frames));
+            fullScore += frame.getBonus() + firstRoll + secondRoll + thirdRoll;
+            frame.setScore(fullScore);
         }
-        gameService.save(currentGame);
+
+        game.setFullScore(fullScore);
+        frameRepository.saveAll(game.getFrames());
+        gameRepository.save(game);
     }
 
-    private void updateFrameBonus(Frame frame, int index) {
-        if (frame.isStrike()) {
-            frame.setBonus(getStrikeBonus(index));
-        } else if (frame.isSpare()) {
-            frame.setBonus(getSpareBonus(index));
-        }
-    }
+    private int getBonus(int frameIndex, List<Frame> frames) {
+        var frame = frames.get(frameIndex);
 
-    private int getStrikeBonus(int index) {
-        if (index == 9) {
+        if (frameIndex == 9 || frames.size() <= frameIndex + 1) {
             return 0;
         }
 
-        var frames = currentGame.getFrames();
-        var nextFrame = frames.get(index + 1);
+        if (frame.isStrike()) {
+            return getStrikeBonus(frameIndex, frames);
+        }
+
+        if (frame.isSpare()) {
+            return getSpareBonus(frameIndex, frames);
+        }
+
+        return 0;
+    }
+
+    private int getStrikeBonus(int frameIndex, List<Frame> frames) {
         var bonus = 0;
+        var nextFrame = frames.get(frameIndex + 1);
 
         if (nextFrame.isStrike()) {
-            bonus = 10;
+            bonus += 10;
 
-            if (index != 8) {
-                bonus += frames.get(index + 2).getFirstRoll();
-            } else {
-                bonus += nextFrame.getSecondRoll();
+            if (frameIndex == 8) {
+                var secondRoll = nextFrame.getSecondRoll();
+                bonus += secondRoll == null ? 0 : secondRoll;
+            } else if (frames.size() > frameIndex + 2) {
+                var firstRoll = frames.get(frameIndex + 2).getFirstRoll();
+                bonus += firstRoll == null ? 0 : firstRoll;
             }
         } else {
-            bonus = nextFrame.getFirstRoll() + nextFrame.getSecondRoll();
+            var firstRoll = nextFrame.getFirstRoll() == null ? 0 : nextFrame.getFirstRoll();
+            var secondRoll = nextFrame.getSecondRoll() == null ? 0 : nextFrame.getSecondRoll();
+            bonus += firstRoll + secondRoll;
         }
 
         return bonus;
     }
 
-    private int getSpareBonus(int index) {
-        if (index == 9) {
-            return 0;
-        }
-
-        var frames = currentGame.getFrames();
-        var nextFrame = frames.get(index + 1);
+    private int getSpareBonus(int frameIndex, List<Frame> frames) {
         var bonus = 0;
 
-        if (nextFrame.isStrike()) {
-            bonus = 10;
-        } else {
-            bonus = nextFrame.getFirstRoll();
+        if (frames.size() > frameIndex + 1) {
+            var firstRoll = frames.get(frameIndex + 1).getFirstRoll();
+            bonus += firstRoll == null ? 0 : firstRoll;
         }
 
         return bonus;
     }
 
-    private Game getCurrentGame() {
-        if (currentGame.getId() == gameId) {
-            return currentGame;
-        }
-
-        try {
-            Game game = gameService.findById(gameId);
-            game.setFrames(
-                    game.getFrames().stream()
-                            .sorted(Comparator.comparingInt(Frame::getNumber))
-                            .collect(Collectors.toList())
-            );
-            return game;
-        } catch (BowlingException e) {
-            throw new BowlingRuntimeException(e.getMessage());
-        }
-    }
-
     @Override
-    public ViewFrame[] getFrames() {
-        return FrameParser.parseFrames(currentGame.getFrames());
-    }
-
-    @Override
-    public void setGameId(int gameId) {
-        this.gameId = gameId;
-        currentGame = getCurrentGame();
-    }
-
-    public boolean isFinished() {
-        return currentGame.isFinished();
+    public List<ViewFrame> getViewFrames(Game game) {
+        return BowlingUtil.parseFrames(game);
     }
 
 }

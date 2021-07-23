@@ -35,25 +35,19 @@
                 <th class="col-lg-24" th:text="${frame.secondRoll.isEmpty() ? '&nbsp;' : frame.secondRoll}">&nbsp;</th>
             </th:block>
 
-            <th class="col-lg-24" th:text="${lastFrame.firstRoll.isEmpty() ? '&nbsp;' : lastFrame.firstRoll}">&nbsp;</th>
-            <th class="col-lg-24" th:text="${lastFrame.secondRoll.isEmpty() ? '&nbsp;' : lastFrame.secondRoll}">&nbsp;</th>
-            <th class="col-lg-24" th:text="${lastFrame.thirdRoll.isEmpty() ? '&nbsp;' : lastFrame.thirdRoll}">&nbsp;</th>
-            <th class="col-lg-24" rowspan="2" colspan="3" style="vertical-align:middle;text-align:center;"
-                th:text="${lastFrame.score}">0</th>
+            <th class="col-lg-24" th:text="${lastFrame == null ? '&nbsp;' : lastFrame.firstRoll}">&nbsp;</th>
+            <th class="col-lg-24" th:text="${lastFrame == null ? '&nbsp;' : lastFrame.secondRoll}">&nbsp;</th>
+            <th class="col-lg-24" th:text="${lastFrame == null ? '&nbsp;' : lastFrame.thirdRoll}">&nbsp;</th>
+            <th class="col-lg-24" rowspan="2" colspan="3" style="vertical-align:middle;text-align:center;" th:text="${fullScore}">0</th>
         </tr>
         <tr>
-            <th class="col-lg-24" th:each="frame:${regularFrames}"
-                th:text="${frame.inGame ? frame.score : '&nbsp;'}" colspan="2">&nbsp;</th>
-            <th class="col-lg-24"  th:text="${lastFrame.inGame ? lastFrame.score : '&nbsp;'}" colspan="3">&nbsp;</th>
+            <th class="col-lg-24" th:each="frame:${regularFrames}" th:text="${frame.score == -1 ? '&nbsp;' : frame.score}" colspan="2">&nbsp;</th>
+
+            <th class="col-lg-24"  th:text="${lastFrame == null || lastFrame.score == -1 ? '&nbsp;' : lastFrame.score}" colspan="3">&nbsp;</th>
         </tr>
         </tbody>
     </table>
     <br>
-
-    <div th:if="${errorMessage != null}" class="mx-auto" style="width: 400px">
-        <p th:text="${errorMessage}" class="alert alert-danger"></p>
-        <br>
-    </div>
 
     <form class="form-control align-content-center text-center mx-auto" action="#" th:action="@{|/bowling/${gameId}|}"
           method="post" th:if="${!isFinished}">
@@ -67,7 +61,7 @@
 
     <div th:if="${isFinished == true}" class="mx-auto alert alert-success" style="width: 400px">
         <h2>Game Finished</h2>
-        <h2 th:text="'Your score: ' + ${lastFrame.score}"></h2>
+        <h2 th:text="'Your score: ' + ${fullScore}"></h2>
     </div>
 
     <form class="align-content-center text-center mx-auto" action="#" th:action="@{/bowling/new}"

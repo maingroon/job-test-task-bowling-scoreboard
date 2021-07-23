@@ -1,17 +1,17 @@
 package ua.casten.bowling.service;
 
+import ua.casten.bowling.exception.BowlingException;
+import ua.casten.bowling.model.Game;
 import ua.casten.bowling.model.ViewFrame;
+
+import java.util.List;
 
 public interface BowlingService {
 
     int startNewGame();
 
-    String makeRoll(String stringScore);
+    void makeRoll(Game game, String stringScore) throws BowlingException;
 
-    ViewFrame[] getFrames();
-
-    void setGameId(int gameId);
-
-    boolean isFinished();
+    List<ViewFrame> getViewFrames(Game game);
 
 }

@@ -4,20 +4,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import ua.casten.bowling.exception.BowlingException;
+import ua.casten.bowling.exception.BowlingRuntimeException;
+import ua.casten.bowling.model.Game;
 import ua.casten.bowling.model.ViewFrame;
+import ua.casten.bowling.repository.GameRepository;
 import ua.casten.bowling.service.BowlingService;
+import ua.casten.bowling.util.BowlingUtil;
 
-import java.util.Arrays;
+import javax.persistence.EntityNotFoundException;
 
 @Controller
 @RequestMapping("/bowling")
 public class BowlingController {
 
     private final BowlingService bowlingService;
+    private final GameRepository gameRepository;
 
     @Autowired
-    public BowlingController(BowlingService bowlingService) {
+    public BowlingController(BowlingService bowlingService, GameRepository gameRepository) {
         this.bowlingService = bowlingService;
+        this.gameRepository = gameRepository;
     }
 
     @GetMapping("")
@@ -28,37 +35,47 @@ public class BowlingController {
     @GetMapping("/{gameId}")
     public String getBowlingPage(@PathVariable int gameId,
                                  Model model,
-                                 String errorMessage) {
-        bowlingService.setGameId(gameId);
-        addAttributesToModel(model);
-        model.addAttribute("errorMessage", errorMessage);
+                                 String exceptionMessage) {
+        var game = gameRepository.getById(gameId);
+        model.addAttribute("exceptionMessage", exceptionMessage);
+        addAttributesToModel(model, game);
         return "bowling-scoreboard";
     }
 
     @PostMapping("/{gameId}")
     public String confirmScore(@PathVariable int gameId,
-                               @RequestParam("score") String score,
-                               Model model) {
-        String errorMessage = bowlingService.makeRoll(score);
-
-        if (!errorMessage.isEmpty()) {
-            return getBowlingPage(gameId, model, errorMessage);
-        }
-
+                               @RequestParam("score") String score) throws BowlingException {
+        var game = gameRepository.getById(gameId);
+        bowlingService.makeRoll(game, score);
         return "redirect:/bowling/" + gameId;
     }
 
     @PostMapping("/new")
     public String restartGame() {
-        int gameId = bowlingService.startNewGame();
+        var gameId = bowlingService.startNewGame();
         return "redirect:/bowling/" + gameId;
     }
 
-    private void addAttributesToModel(Model model) {
-        ViewFrame[] viewFrames = bowlingService.getFrames();
-        model.addAttribute("regularFrames", Arrays.copyOfRange(viewFrames, 0, 9));
-        model.addAttribute("lastFrame", viewFrames[9]);
-        model.addAttribute("isFinished", bowlingService.isFinished());
+    @ExceptionHandler({BowlingException.class, BowlingRuntimeException.class, EntityNotFoundException.class})
+    public String errorPage(Model model, Exception exception) {
+        model.addAttribute("exceptionMessage", exception.getMessage());
+        return "error";
+    }
+
+    private void addAttributesToModel(Model model, Game game) {
+        var viewFrames = BowlingUtil.parseFrames(game);
+        int regularFramesSize = 0;
+        ViewFrame lastFrame = null;
+        if (!viewFrames.isEmpty()) {
+            regularFramesSize = viewFrames.size() - 1;
+        }
+        if (viewFrames.size() > 9) {
+            lastFrame = viewFrames.get(9);
+        }
+        model.addAttribute("regularFrames", viewFrames.subList(0, regularFramesSize));
+        model.addAttribute("lastFrame", lastFrame);
+        model.addAttribute("fullScore", game.getFullScore());
+        model.addAttribute("isFinished", game.isFinished());
     }
 
 }

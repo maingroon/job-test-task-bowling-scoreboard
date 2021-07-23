@@ -1,4 +1,4 @@
-package ua.casten.bowling.model.repository;
+package ua.casten.bowling.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

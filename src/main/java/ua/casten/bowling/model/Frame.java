@@ -1,13 +1,11 @@
 package ua.casten.bowling.model;
 
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
+@NoArgsConstructor
 @Getter
 @Setter
 @EqualsAndHashCode(of = "id")
@@ -26,34 +24,24 @@ public class Frame {
     @Column(name = "number", nullable = false)
     private int number;
 
-    @Column(name = "first_roll", nullable = false)
-    private int firstRoll;
+    @Column(name = "first_roll")
+    private Integer firstRoll;
 
-    @Column(name = "second_roll", nullable = false)
-    private int secondRoll;
+    @Column(name = "second_roll")
+    private Integer secondRoll;
 
-    @Column(name = "third_roll", nullable = false)
-    private int thirdRoll;
+    @Column(name = "third_roll")
+    private Integer thirdRoll;
 
-    @Column(name = "roll_number", nullable = false)
-    private int rollNumber;
+    @Column(name = "bonus")
+    private Integer bonus;
+
+    @Column(name = "score")
+    private Integer score;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "game_id", foreignKey = @ForeignKey(name = "game_fkey"))
     private Game game;
-
-    @Column(name = "bonus", nullable = false)
-    private int bonus;
-
-    @Column(name = "score", nullable = false)
-    private int score;
-
-    @Column(name = "in_game", nullable = false)
-    private boolean inGame;
-
-    public Frame() {
-        rollNumber = 1;
-    }
 
     public boolean isStrike() {
         return firstRoll == MAX_SCORE;
