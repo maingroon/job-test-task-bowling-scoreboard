@@ -68,7 +68,7 @@ public class BowlingServiceImpl implements BowlingService {
         var frames = BowlingUtil.sortFrames(game.getFrames());
         Frame frame;
 
-        if (checkCreateNew(frames)) {
+        if (checkCreateNewFrame(frames)) {
             frame = createNewFrame(frames.size() + 1);
             frame.setGame(game);
             game.getFrames().add(frame);
@@ -79,7 +79,7 @@ public class BowlingServiceImpl implements BowlingService {
         return frame;
     }
 
-    private boolean checkCreateNew(List<Frame> frames) {
+    private boolean checkCreateNewFrame(List<Frame> frames) {
         if (frames.isEmpty()) {
             return true;
         }
@@ -89,7 +89,6 @@ public class BowlingServiceImpl implements BowlingService {
         }
 
         var frame = frames.get(frames.size() - 1);
-
         return frame.getSecondRoll() != null || frame.getFirstRoll() == 10;
     }
 
@@ -164,7 +163,6 @@ public class BowlingServiceImpl implements BowlingService {
 
         game.setFullScore(fullScore);
         frameRepository.saveAll(game.getFrames());
-        gameRepository.save(game);
     }
 
     private int getBonus(int frameIndex, List<Frame> frames) {
