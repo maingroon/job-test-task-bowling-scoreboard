@@ -15,6 +15,9 @@ public class RegularFrame extends Frame {
     @Setter(AccessLevel.NONE)
     private static final int MAX_SCORE = 10;
 
+    @Column(name = "bonus")
+    protected Integer bonus;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "game_id", foreignKey = @ForeignKey(name = "game_fkey"))
     private Game game;

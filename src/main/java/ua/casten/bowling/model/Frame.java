@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
-abstract class Frame {
+public abstract class Frame {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -26,9 +26,6 @@ abstract class Frame {
 
     @Column(name = "second_roll")
     protected Integer secondRoll;
-
-    @Column(name = "bonus")
-    protected Integer bonus;
 
     @Column(name = "score")
     protected Integer score;

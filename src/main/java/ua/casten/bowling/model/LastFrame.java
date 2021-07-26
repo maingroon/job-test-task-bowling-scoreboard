@@ -18,4 +18,7 @@ public class LastFrame extends Frame {
     @JoinColumn(name = "game_id", foreignKey = @ForeignKey(name = "game_fkey"))
     private Game game;
 
+    public LastFrame() {
+        number = 10;
+    }
 }
