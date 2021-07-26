@@ -1,23 +1,21 @@
 package ua.casten.bowling.model;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 
 @Entity
-@NoArgsConstructor
-@Getter
 @Setter
+@Getter
 @Table(name = "last_frame")
 public class LastFrame extends Frame {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private long id;
-
     @Column(name = "third_roll")
     private Integer thirdRoll;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "game_id", foreignKey = @ForeignKey(name = "game_fkey"))
+    private Game game;
 
 }

@@ -1,51 +1,36 @@
 package ua.casten.bowling.model;
 
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
-@Entity
-@NoArgsConstructor
+@MappedSuperclass
 @Getter
 @Setter
+@NoArgsConstructor
 @EqualsAndHashCode(of = "id")
-@Table(name = "frame")
-public class Frame {
+abstract class Frame {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private long id;
-
-    @Transient
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
-    private static final int MAX_SCORE = 10;
+    protected long id;
 
     @Column(name = "number", nullable = false)
-    private int number;
+    protected int number;
 
     @Column(name = "first_roll")
-    private Integer firstRoll;
+    protected Integer firstRoll;
 
     @Column(name = "second_roll")
-    private Integer secondRoll;
+    protected Integer secondRoll;
 
     @Column(name = "bonus")
-    private Integer bonus;
+    protected Integer bonus;
 
     @Column(name = "score")
-    private Integer score;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "game_id", foreignKey = @ForeignKey(name = "game_fkey"))
-    private Game game;
-
-    public boolean isStrike() {
-        return firstRoll == MAX_SCORE;
-    }
-
-    public boolean isSpare() {
-        return !isStrike() && (firstRoll + secondRoll) == MAX_SCORE;
-    }
+    protected Integer score;
 
 }
