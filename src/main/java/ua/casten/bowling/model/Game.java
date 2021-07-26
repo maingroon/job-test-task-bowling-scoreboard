@@ -19,7 +19,7 @@ public class Game {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private int id;
+    private long id;
 
     @Column(name = "full_score")
     private int fullScore;

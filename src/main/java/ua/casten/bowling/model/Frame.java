@@ -14,7 +14,7 @@ public class Frame {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private int id;
+    private long id;
 
     @Transient
     @Getter(AccessLevel.NONE)
@@ -29,9 +29,6 @@ public class Frame {
 
     @Column(name = "second_roll")
     private Integer secondRoll;
-
-    @Column(name = "third_roll")
-    private Integer thirdRoll;
 
     @Column(name = "bonus")
     private Integer bonus;
