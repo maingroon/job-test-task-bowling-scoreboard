@@ -55,8 +55,7 @@ public class LastFrameService {
     }
 
     private void makeThirdLastFrameRoll(Game game, LastFrame lastFrame, int score) throws BowlingException {
-        if (lastFrame.getFirstRoll() != 10
-            && lastFrame.getSecondRoll() != 10
+        if (lastFrame.getSecondRoll() != 10
             && lastFrame.getFirstRoll() + lastFrame.getSecondRoll() != 10
             && lastFrame.getSecondRoll() + lastFrame.getThirdRoll() > 10) {
             throw new BowlingException("Sum of second and third rolls in last frame cannot be greater than 10 " +
@@ -71,12 +70,11 @@ public class LastFrameService {
         lastFrameRepository.save(lastFrame);
         regularFrameService.updateFramesData(frames, lastFrame);
 
-        int score = frames.get(8).getScore();
-        var firstRoll = lastFrame.getFirstRoll() == null ? 0 : lastFrame.getFirstRoll();
+        var score = frames.get(8).getScore();
         var secondRoll = lastFrame.getSecondRoll() == null ? 0 : lastFrame.getSecondRoll();
         var thirdRoll = lastFrame.getThirdRoll() == null ? 0 : lastFrame.getThirdRoll();
 
-        score += firstRoll + secondRoll + thirdRoll;
+        score += lastFrame.getFirstRoll() + secondRoll + thirdRoll;
         lastFrame.setScore(score);
         lastFrameRepository.save(lastFrame);
     }

@@ -34,10 +34,7 @@ public class RegularFrameService {
         if (regularFrame.getFirstRoll() == null) {
             regularFrame.setFirstRoll(score);
         } else if (regularFrame.getSecondRoll() == null) {
-            if (!regularFrame.isStrike() && regularFrame.getFirstRoll() + score > 10) {
-                throw new BowlingRuntimeException("Sum of rolls in regular frame cannot be greater than 10");
-            }
-            regularFrame.setSecondRoll(score);
+            makeSecondRoll(regularFrame, score);
         } else {
             throw new BowlingRuntimeException("Cannot roll third time in regular frame.");
         }
@@ -46,15 +43,21 @@ public class RegularFrameService {
         return true;
     }
 
+    private void makeSecondRoll(RegularFrame regularFrame, int score) {
+        if (!regularFrame.isStrike() && regularFrame.getFirstRoll() + score > 10) {
+            throw new BowlingRuntimeException("Sum of rolls in regular frame cannot be greater than 10");
+        }
+        regularFrame.setSecondRoll(score);
+    }
+
     public void updateFramesData(List<RegularFrame> frames, LastFrame lastFrame) {
         var score = 0;
 
         for (var i = 0; i < frames.size(); i++) {
             var frame = frames.get(i);
             frame.setBonus(getFrameBonus(frames, lastFrame, i));
-            var firstRoll = frame.getFirstRoll() == null ? 0 : frame.getFirstRoll();
             var secondRoll = frame.getSecondRoll() == null ? 0 : frame.getSecondRoll();
-            score += firstRoll + secondRoll + frame.getBonus();
+            score += frame.getFirstRoll() + secondRoll + frame.getBonus();
             frame.setScore(score);
         }
 
@@ -65,9 +68,13 @@ public class RegularFrameService {
         var bonus = 0;
         var frame = frames.get(frameIndex);
 
-        if (frame.getFirstRoll() != null && frame.isStrike()) {
+        if ((frameIndex != 8 && frameIndex + 1 >= frames.size()) || frame.getFirstRoll() == null) {
+            return 0;
+        }
+
+        if (frame.isStrike()) {
             bonus += getStrikeBonus(frames, lastFrame, frameIndex);
-        } else if (frame.getFirstRoll() != null && frame.getSecondRoll() != null && frame.isSpare()) {
+        } else if (frame.getSecondRoll() != null && frame.isSpare()) {
             bonus += getSpareBonus(frames, lastFrame, frameIndex);
         }
 
@@ -75,23 +82,20 @@ public class RegularFrameService {
     }
 
     private int getStrikeBonus(List<RegularFrame> frames, LastFrame lastFrame, int frameIndex) {
-        if (frameIndex + 1 != 9 && frameIndex + 1 >= frames.size()) {
-            return 0;
+        var bonus = getSpareBonus(frames, lastFrame, frameIndex);
+        var nextFrame = frameIndex < 7 ? frames.get(frameIndex + 1) : lastFrame;
+
+        if (nextFrame == null || nextFrame.getFirstRoll() == null) {
+            return bonus;
         }
 
-        var bonus = getSpareBonus(frames, lastFrame, frameIndex);
-
-        if (frameIndex < 7) {
-            var nextFrame = frames.get(frameIndex + 1);
-
-            if (nextFrame.getFirstRoll() != null && nextFrame.isStrike() && frameIndex + 2 < frames.size()) {
+        if (frameIndex < 8) {
+            if (nextFrame.getFirstRoll() == 10) {
                 bonus += getSpareBonus(frames, lastFrame, frameIndex + 2);
-            } else if (nextFrame.getFirstRoll() != null && !nextFrame.isStrike()) {
+            } else {
                 bonus += nextFrame.getSecondRoll() == null ? 0 : nextFrame.getSecondRoll();
             }
-        } else if (frameIndex == 7) {
-            bonus += getSpareBonus(frames, lastFrame, frameIndex + 1);
-        } else if (lastFrame != null && frames.get(frameIndex).isStrike()) {
+        } else if (frameIndex == 8 && nextFrame.getFirstRoll() == 10) {
             bonus += lastFrame.getSecondRoll() == null ? 0 : lastFrame.getSecondRoll();
         }
 
@@ -99,13 +103,12 @@ public class RegularFrameService {
     }
 
     private int getSpareBonus(List<RegularFrame> frames, LastFrame lastFrame, int frameIndex) {
-
         var bonus = 0;
 
-        if (frameIndex < 8 && frameIndex + 1 < frames.size()) {
+        if (frameIndex + 1 < frames.size()) {
             var nextFrame = frames.get(frameIndex + 1);
             bonus += nextFrame.getFirstRoll() == null ? 0 : nextFrame.getFirstRoll();
-        } else if (frameIndex >= 8 && lastFrame != null) {
+        } else if (lastFrame != null) {
             bonus += lastFrame.getFirstRoll() == null ? 0 : lastFrame.getFirstRoll();
         }
 
