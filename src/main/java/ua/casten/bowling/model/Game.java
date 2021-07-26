@@ -27,9 +27,11 @@ public class Game {
     @Column(name = "finished", nullable = false)
     private boolean isFinished;
 
-    @Setter
     @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)
-    private List<Frame> frames = new ArrayList<>(10);
+    private List<RegularFrame> regularFrames = new ArrayList<>(9);
+
+    @OneToOne(mappedBy = "game", fetch = FetchType.LAZY)
+    private LastFrame lastFrame;
 
     public void finishGame() {
         isFinished = true;
