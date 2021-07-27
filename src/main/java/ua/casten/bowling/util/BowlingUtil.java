@@ -1,6 +1,5 @@
 package ua.casten.bowling.util;
 
-import ua.casten.bowling.exception.BowlingException;
 import ua.casten.bowling.model.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,22 +21,6 @@ public class BowlingUtil {
         return frameList.stream()
                 .sorted(comparing(RegularFrame::getNumber))
                 .collect(toList());
-    }
-
-    public static int validateScore(String stringScore) throws BowlingException {
-        int score;
-
-        try {
-            score = Integer.parseInt(stringScore.trim());
-        } catch (NumberFormatException e) {
-            throw new BowlingException("Enter valid score (without symbols and spaces).");
-        }
-
-        if (score < 0 || score > 10) {
-            throw new BowlingException("Score cannot be less than 0 or greater than 10.");
-        }
-
-        return score;
     }
 
     public static List<RegularViewFrame> parseRegularFrames(Game game) {

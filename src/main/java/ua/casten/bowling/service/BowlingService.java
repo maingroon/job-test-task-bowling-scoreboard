@@ -7,6 +7,6 @@ public interface BowlingService {
 
     long startNewGame();
 
-    void makeRoll(Game game, String stringScore) throws BowlingException;
+    void makeRoll(Game game, int score) throws BowlingException;
 
 }

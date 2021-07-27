@@ -11,7 +11,10 @@ import ua.casten.bowling.repository.GameRepository;
 import ua.casten.bowling.service.BowlingService;
 import ua.casten.bowling.util.BowlingUtil;
 
+import javax.validation.constraints.Max;
+
 import javax.persistence.EntityNotFoundException;
+import javax.validation.constraints.Min;
 
 @Controller
 @RequestMapping("/bowling")
@@ -43,7 +46,11 @@ public class BowlingController {
 
     @PostMapping("/{gameId}")
     public String confirmScore(@PathVariable long gameId,
-                               @RequestParam("score") String score) throws BowlingException {
+                               @RequestParam("score")
+                               @Min(value = 0, message = "Score cannot be less than 0.")
+                               @Max(value = 10, message = "Score cannot be greater than 10.")
+                                       int score)
+                               throws BowlingException {
         var game = gameRepository.getById(gameId);
         bowlingService.makeRoll(game, score);
         return "redirect:/bowling/" + gameId;

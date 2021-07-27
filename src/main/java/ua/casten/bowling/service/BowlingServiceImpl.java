@@ -30,12 +30,10 @@ public class BowlingServiceImpl implements BowlingService {
     }
 
     @Override
-    public void makeRoll(Game game, String stringScore) throws BowlingException {
+    public void makeRoll(Game game, int score) throws BowlingException {
         if (game.isFinished()) {
             throw new BowlingRuntimeException("A new roll cannot be made, the game is over.");
         }
-
-        var score = BowlingUtil.validateScore(stringScore);
 
         if (!regularFrameService.makeRoll(game, score)) {
             lastFrameService.makeRoll(game, score);
