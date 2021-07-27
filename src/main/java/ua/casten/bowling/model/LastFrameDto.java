@@ -3,11 +3,11 @@ package ua.casten.bowling.model;
 import lombok.Getter;
 
 @Getter
-public class LastViewFrame extends RegularViewFrame {
+public class LastFrameDto extends RegularFrameDto {
 
     private final String thirdRoll;
 
-    public LastViewFrame(String firstRoll, String secondRoll, String thirdRoll, int score) {
+    public LastFrameDto(String firstRoll, String secondRoll, String thirdRoll, int score) {
         super(firstRoll, secondRoll, score);
         this.thirdRoll = thirdRoll;
     }

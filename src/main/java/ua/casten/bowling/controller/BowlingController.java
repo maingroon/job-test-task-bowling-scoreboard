@@ -3,19 +3,20 @@ package ua.casten.bowling.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ua.casten.bowling.exception.BowlingException;
-import ua.casten.bowling.exception.BowlingRuntimeException;
 import ua.casten.bowling.model.Game;
 import ua.casten.bowling.repository.GameRepository;
 import ua.casten.bowling.service.BowlingService;
 import ua.casten.bowling.util.BowlingUtil;
+import ua.casten.bowling.util.LastFrameDtoBuilder;
+import ua.casten.bowling.util.RegularFrameDtoBuilder;
 
 import javax.validation.constraints.Max;
-
-import javax.persistence.EntityNotFoundException;
 import javax.validation.constraints.Min;
 
+@Validated
 @Controller
 @RequestMapping("/bowling")
 public class BowlingController {
@@ -50,7 +51,7 @@ public class BowlingController {
                                @Min(value = 0, message = "Score cannot be less than 0.")
                                @Max(value = 10, message = "Score cannot be greater than 10.")
                                        int score)
-                               throws BowlingException {
+            throws BowlingException {
         var game = gameRepository.getById(gameId);
         bowlingService.makeRoll(game, score);
         return "redirect:/bowling/" + gameId;
@@ -62,15 +63,16 @@ public class BowlingController {
         return "redirect:/bowling/" + gameId;
     }
 
-    @ExceptionHandler({BowlingException.class, BowlingRuntimeException.class, EntityNotFoundException.class})
+    @ExceptionHandler({Exception.class, RuntimeException.class})
     public String errorPage(Model model, Exception exception) {
         model.addAttribute("exceptionMessage", exception.getMessage());
         return "error";
     }
 
     private void addAttributesToModel(Model model, Game game) {
-        var regularFrames = BowlingUtil.parseRegularFrames(game);
-        var lastFrame = BowlingUtil.parseLastFrame(game);
+        var regularFrames =
+                RegularFrameDtoBuilder.transferRegularFrames(BowlingUtil.sortFrames(game.getRegularFrames()));
+        var lastFrame = LastFrameDtoBuilder.transferLastFrame(game.getLastFrame());
         model.addAttribute("regularFrames", regularFrames);
         model.addAttribute("lastFrame", lastFrame);
         model.addAttribute("fullScore", game.getFullScore());
