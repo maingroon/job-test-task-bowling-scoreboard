@@ -11,6 +11,8 @@ import ua.casten.bowling.util.BowlingUtil;
 
 import java.util.List;
 
+import static ua.casten.bowling.constant.Constants.MAX_ROLL_SCORE;
+
 @Service
 public class RegularFrameService {
 
@@ -44,7 +46,7 @@ public class RegularFrameService {
     }
 
     private void makeSecondRoll(RegularFrame regularFrame, int score) {
-        if (!regularFrame.isStrike() && regularFrame.getFirstRoll() + score > 10) {
+        if (!regularFrame.isStrike() && regularFrame.getFirstRoll() + score > MAX_ROLL_SCORE) {
             throw new BowlingRuntimeException("Sum of rolls in regular frame cannot be greater than 10");
         }
         regularFrame.setSecondRoll(score);
@@ -90,12 +92,12 @@ public class RegularFrameService {
         }
 
         if (frameIndex < 8) {
-            if (nextFrame.getFirstRoll() == 10) {
+            if (nextFrame.getFirstRoll() == MAX_ROLL_SCORE) {
                 bonus += getSpareBonus(frames, lastFrame, frameIndex + 2);
             } else {
                 bonus += nextFrame.getSecondRoll() == null ? 0 : nextFrame.getSecondRoll();
             }
-        } else if (frameIndex == 8 && nextFrame.getFirstRoll() == 10) {
+        } else if (frameIndex == 8 && nextFrame.getFirstRoll() == MAX_ROLL_SCORE) {
             bonus += lastFrame.getSecondRoll() == null ? 0 : lastFrame.getSecondRoll();
         }
 

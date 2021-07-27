@@ -12,6 +12,8 @@ import ua.casten.bowling.util.BowlingUtil;
 
 import java.util.List;
 
+import static ua.casten.bowling.constant.Constants.MAX_ROLL_SCORE;
+
 @Service
 public class LastFrameService {
 
@@ -42,22 +44,22 @@ public class LastFrameService {
     }
 
     private void makeSecondLastFrameRoll(Game game, LastFrame lastFrame, int score) throws BowlingException {
-        if (lastFrame.getFirstRoll() != 10 && lastFrame.getFirstRoll() + score > 10) {
+        if (lastFrame.getFirstRoll() != MAX_ROLL_SCORE && lastFrame.getFirstRoll() + score > MAX_ROLL_SCORE) {
             throw new BowlingException("Sum of first and second rolls in last frame cannot be greater than 10 " +
                     "without strike in first roll.");
         }
 
         lastFrame.setSecondRoll(score);
 
-        if (lastFrame.getFirstRoll() != 10 && lastFrame.getFirstRoll() + score < 10) {
+        if (lastFrame.getFirstRoll() != MAX_ROLL_SCORE && lastFrame.getFirstRoll() + score < MAX_ROLL_SCORE) {
             game.setFinished(true);
         }
     }
 
     private void makeThirdLastFrameRoll(Game game, LastFrame lastFrame, int score) throws BowlingException {
-        if (lastFrame.getSecondRoll() != 10
-            && lastFrame.getFirstRoll() + lastFrame.getSecondRoll() != 10
-            && lastFrame.getSecondRoll() + lastFrame.getThirdRoll() > 10) {
+        if (lastFrame.getSecondRoll() != MAX_ROLL_SCORE
+            && lastFrame.getFirstRoll() + lastFrame.getSecondRoll() != MAX_ROLL_SCORE
+            && lastFrame.getSecondRoll() + lastFrame.getThirdRoll() > MAX_ROLL_SCORE) {
             throw new BowlingException("Sum of second and third rolls in last frame cannot be greater than 10 " +
                     "without second roll strike or spare.");
         }

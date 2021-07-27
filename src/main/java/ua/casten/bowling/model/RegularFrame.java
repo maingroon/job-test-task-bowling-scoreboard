@@ -4,16 +4,13 @@ import lombok.*;
 
 import javax.persistence.*;
 
+import static ua.casten.bowling.constant.Constants.MAX_ROLL_SCORE;
+
 @Entity
 @Getter
 @Setter
 @Table(name = "regular_frame")
 public class RegularFrame extends Frame {
-
-    @Transient
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
-    private static final int MAX_SCORE = 10;
 
     @Column(name = "bonus")
     protected Integer bonus;
@@ -23,11 +20,11 @@ public class RegularFrame extends Frame {
     private Game game;
 
     public boolean isStrike() {
-        return firstRoll == MAX_SCORE;
+        return firstRoll == MAX_ROLL_SCORE;
     }
 
     public boolean isSpare() {
-        return !isStrike() && (firstRoll + secondRoll) == MAX_SCORE;
+        return !isStrike() && (firstRoll + secondRoll) == MAX_ROLL_SCORE;
     }
 
 }
