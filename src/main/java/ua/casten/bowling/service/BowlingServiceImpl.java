@@ -45,12 +45,12 @@ public class BowlingServiceImpl implements BowlingService {
     }
 
     private void updateGameData(Game game) {
-        var regularFrames = BowlingUtil.sortFrames(game.getRegularFrames());
-        var lastFrame = game.getLastFrame();
 
-        if (lastFrame != null) {
+        if (game.getLastFrame() != null) {
+            var lastFrame = game.getLastFrame();
             game.setFullScore(lastFrame.getScore());
         } else {
+            var regularFrames = BowlingUtil.sortFrames(game.getRegularFrames());
             game.setFullScore(regularFrames.get(regularFrames.size() - 1).getScore());
         }
 
