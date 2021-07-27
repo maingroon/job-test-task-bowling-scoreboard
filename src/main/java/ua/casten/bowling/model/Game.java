@@ -4,6 +4,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ua.casten.bowling.service.BowlingService;
+import ua.casten.bowling.util.BowlingUtil;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -33,8 +35,21 @@ public class Game {
     @OneToOne(mappedBy = "game", fetch = FetchType.LAZY)
     private LastFrame lastFrame;
 
-    public void finishGame() {
-        isFinished = true;
+    public Frame getLastPlayedFrame() {
+        if (lastFrame == null) {
+            return !regularFrames.isEmpty() ? regularFrames.get(regularFrames.size() - 1) : null;
+        } else {
+            return lastFrame;
+        }
+    }
+
+    public List<Frame> getAllSortedFrames() {
+        List<Frame> frames = new ArrayList<>(BowlingUtil.sortFrames(regularFrames));
+        if (lastFrame != null) {
+            frames.add(lastFrame);
+        }
+
+        return frames;
     }
 
 }
