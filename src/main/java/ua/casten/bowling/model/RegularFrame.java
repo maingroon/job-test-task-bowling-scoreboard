@@ -4,8 +4,6 @@ import lombok.*;
 
 import javax.persistence.*;
 
-import static ua.casten.bowling.constant.Constants.MAX_ROLL_SCORE;
-
 @Entity
 @Getter
 @Setter

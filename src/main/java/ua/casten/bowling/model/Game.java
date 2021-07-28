@@ -4,7 +4,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ua.casten.bowling.service.BowlingService;
 import ua.casten.bowling.util.BowlingUtil;
 
 import javax.persistence.*;

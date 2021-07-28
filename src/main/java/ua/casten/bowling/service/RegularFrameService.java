@@ -6,13 +6,10 @@ import ua.casten.bowling.exception.BowlingException;
 import ua.casten.bowling.exception.BowlingRuntimeException;
 import ua.casten.bowling.model.Frame;
 import ua.casten.bowling.model.Game;
-import ua.casten.bowling.model.LastFrame;
 import ua.casten.bowling.model.RegularFrame;
 import ua.casten.bowling.repository.RegularFrameRepository;
-import ua.casten.bowling.util.BowlingUtil;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static ua.casten.bowling.constant.Constants.MAX_ROLL_SCORE;
