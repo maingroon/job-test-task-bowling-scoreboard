@@ -6,6 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ua.casten.bowling.exception.BowlingException;
+import ua.casten.bowling.exception.BowlingRuntimeException;
 import ua.casten.bowling.model.Game;
 import ua.casten.bowling.repository.GameRepository;
 import ua.casten.bowling.service.BowlingService;
@@ -13,6 +14,7 @@ import ua.casten.bowling.util.BowlingUtil;
 import ua.casten.bowling.util.LastFrameDtoBuilder;
 import ua.casten.bowling.util.RegularFrameDtoBuilder;
 
+import javax.validation.ConstraintViolationException;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
@@ -63,7 +65,10 @@ public class BowlingController {
         return "redirect:/bowling/" + gameId;
     }
 
-    @ExceptionHandler({Exception.class, RuntimeException.class})
+    @ExceptionHandler({BowlingException.class,
+            BowlingRuntimeException.class,
+            NumberFormatException.class,
+            ConstraintViolationException.class})
     public String errorPage(Model model, Exception exception) {
         model.addAttribute("exceptionMessage", exception.getMessage());
         return "error";
