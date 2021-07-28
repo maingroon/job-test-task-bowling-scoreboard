@@ -1,4 +1,4 @@
-package ua.casten.bowling.model;
+package ua.casten.bowling.model.dto;
 
 import lombok.Getter;
 
