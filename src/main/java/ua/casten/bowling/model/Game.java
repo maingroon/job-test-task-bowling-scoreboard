@@ -29,18 +29,19 @@ public class Game {
     @Column(name = "finished", nullable = false)
     private boolean isFinished;
 
-    @OneToMany(mappedBy = "game", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "game", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<RegularFrame> regularFrames = new ArrayList<>(9);
 
-    @OneToOne(mappedBy = "game", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "game", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private LastFrame lastFrame;
 
     public Frame getLastPlayedFrame() {
-        if (lastFrame == null) {
-            return !regularFrames.isEmpty() ? regularFrames.get(regularFrames.size() - 1) : null;
-        } else {
-            return lastFrame;
+        var frames = getAllSortedFrames();
+        if (frames.isEmpty()) {
+            return null;
         }
+
+        return frames.get(frames.size() - 1);
     }
 
     public List<Frame> getAllSortedFrames() {
