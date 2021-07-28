@@ -1,7 +1,7 @@
 package ua.casten.bowling.util;
 
 import ua.casten.bowling.model.LastFrame;
-import ua.casten.bowling.model.LastFrameDto;
+import ua.casten.bowling.model.dto.LastFrameDto;
 
 import static ua.casten.bowling.constant.Constants.*;
 

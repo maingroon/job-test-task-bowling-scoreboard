@@ -1,7 +1,7 @@
 package ua.casten.bowling.util;
 
 import ua.casten.bowling.model.RegularFrame;
-import ua.casten.bowling.model.RegularFrameDto;
+import ua.casten.bowling.model.dto.RegularFrameDto;
 
 import java.util.ArrayList;
 import java.util.List;

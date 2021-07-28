@@ -4,9 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.casten.bowling.exception.BowlingException;
 import ua.casten.bowling.exception.BowlingRuntimeException;
+import ua.casten.bowling.model.Frame;
 import ua.casten.bowling.model.Game;
 import ua.casten.bowling.repository.GameRepository;
-import ua.casten.bowling.util.BowlingUtil;
 
 @Service
 public class BowlingServiceImpl implements BowlingService {
@@ -35,23 +35,35 @@ public class BowlingServiceImpl implements BowlingService {
             throw new BowlingRuntimeException("A new roll cannot be made, the game is over.");
         }
 
-        if (!regularFrameService.makeRoll(game, score)) {
-            lastFrameService.makeRoll(game, score);
-        }
-
+        getFrameService(game).makeRoll(game, score);
         updateGameData(game);
     }
 
-    private void updateGameData(Game game) {
+    private FrameService getFrameService(Game game) {
+        var lastPlayedFrame = game.getLastPlayedFrame();
+        if (lastFrameInGame(lastPlayedFrame)) {
+            return lastFrameService;
+        }
+        return regularFrameService;
+    }
 
+    private boolean lastFrameInGame(Frame lastPlayedFrame) {
+        return lastPlayedFrame != null
+                && (lastPlayedFrame.getNumber() == 10
+                        || (lastPlayedFrame.getNumber() == 9
+                        && lastPlayedFrame.isPlayed()));
+    }
+
+    private void updateGameData(Game game) {
+        regularFrameService.updateFramesData(game);
         if (game.getLastFrame() != null) {
-            var lastFrame = game.getLastFrame();
-            game.setFullScore(lastFrame.getScore());
-        } else {
-            var regularFrames = BowlingUtil.sortFrames(game.getRegularFrames());
-            game.setFullScore(regularFrames.get(regularFrames.size() - 1).getScore());
+            lastFrameService.updateFramesData(game);
         }
 
+        var lastPlayedFrame = game.getLastPlayedFrame();
+        if (lastPlayedFrame != null) {
+            game.setFullScore(lastPlayedFrame.getScore());
+        }
         gameRepository.save(game);
     }
 
