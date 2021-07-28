@@ -7,6 +7,7 @@ import ua.casten.bowling.exception.BowlingRuntimeException;
 import ua.casten.bowling.model.Game;
 import ua.casten.bowling.model.LastFrame;
 import ua.casten.bowling.repository.LastFrameRepository;
+import ua.casten.bowling.util.BowlingUtil;
 
 import static ua.casten.bowling.constant.Constants.MAX_ROLL_SCORE;
 
@@ -52,7 +53,7 @@ public class LastFrameService implements FrameService {
     }
 
     private void makeSecondLastFrameRoll(LastFrame lastFrame, int score) throws BowlingException {
-    if (lastFrame.getFirstRoll() != MAX_ROLL_SCORE && lastFrame.getFirstRoll() + score > MAX_ROLL_SCORE) {
+    if (!lastFrame.isStrike() && lastFrame.getFirstRoll() + score > MAX_ROLL_SCORE) {
         throw new BowlingException("Sum of first and second rolls in last frame cannot be greater than 10 " +
                 "without strike in first roll.");
     }
@@ -71,7 +72,7 @@ public class LastFrameService implements FrameService {
 
     @Override
     public void updateFramesData(Game game) {
-        var score = game.getAllSortedFrames().get(8).getScore();
+        var score = BowlingUtil.sortFrames(game.getRegularFrames()).get(8).getScore();
         var lastFrame = game.getLastFrame();
         var secondRoll = lastFrame.getSecondRoll() == null ? 0 : lastFrame.getSecondRoll();
         var thirdRoll = lastFrame.getThirdRoll() == null ? 0 : lastFrame.getThirdRoll();

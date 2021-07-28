@@ -30,7 +30,7 @@ public class RegularFrameService implements FrameService {
 
         if (lastPlayedFrame == null || lastPlayedFrame.isPlayed()) {
             var number = lastPlayedFrame == null ? 1 : lastPlayedFrame.getNumber() + 1;
-           lastPlayedFrame = createNewFrame(game, number);
+            lastPlayedFrame = createNewFrame(game, number);
         }
 
         if (lastPlayedFrame.getFirstRoll() == null) {

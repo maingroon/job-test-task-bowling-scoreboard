@@ -49,10 +49,7 @@ public class BowlingController {
 
     @PostMapping("/{gameId}")
     public String confirmScore(@PathVariable long gameId,
-                               @RequestParam("score")
-                               @Min(value = 0, message = "Score cannot be less than 0.")
-                               @Max(value = 10, message = "Score cannot be greater than 10.")
-                                       int score)
+                               @RequestParam("score") @Min(0) @Max(10) int score)
             throws BowlingException {
         var game = gameRepository.getById(gameId);
         bowlingService.makeRoll(game, score);
@@ -65,12 +62,23 @@ public class BowlingController {
         return "redirect:/bowling/" + gameId;
     }
 
-    @ExceptionHandler({BowlingException.class,
-            BowlingRuntimeException.class,
-            NumberFormatException.class,
-            ConstraintViolationException.class})
-    public String errorPage(Model model, Exception exception) {
-        model.addAttribute("exceptionMessage", exception.getMessage());
+    @ExceptionHandler({BowlingException.class, BowlingRuntimeException.class})
+    public String bowlingExceptionHandler(Model model, Exception exception) {
+        return errorPage(model, exception.getMessage());
+    }
+
+    @ExceptionHandler(NumberFormatException.class)
+    public String numberFormatExceptionHandler(Model model) {
+        return errorPage(model, "Enter valid score (without symbols, spaces or empty field).");
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public String constraintViolationExceptionHandler(Model model) {
+        return errorPage(model, "Score cannot be less than 0 or greater than 10.");
+    }
+
+    private String errorPage(Model model, String message) {
+        model.addAttribute("exceptionMessage", message);
         return "error";
     }
 
