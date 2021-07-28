@@ -21,4 +21,9 @@ public class LastFrame extends Frame {
     public LastFrame() {
         number = 10;
     }
+
+    @Override
+    public boolean isPlayed() {
+        return firstRoll != null && secondRoll != null && (thirdRoll != null || (!isStrike() && !isSpare()));
+    }
 }

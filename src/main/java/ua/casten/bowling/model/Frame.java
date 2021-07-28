@@ -7,6 +7,8 @@ import lombok.Setter;
 
 import javax.persistence.*;
 
+import static ua.casten.bowling.constant.Constants.MAX_ROLL_SCORE;
+
 @MappedSuperclass
 @Getter
 @Setter
@@ -29,5 +31,18 @@ public abstract class Frame {
 
     @Column(name = "score")
     protected Integer score;
+
+    @Column(name = "bonus")
+    protected Integer bonus;
+
+    public boolean isStrike() {
+        return firstRoll == MAX_ROLL_SCORE;
+    }
+
+    public boolean isSpare() {
+        return !isStrike() && (firstRoll + secondRoll) == MAX_ROLL_SCORE;
+    }
+
+    public abstract boolean isPlayed();
 
 }
