@@ -3,6 +3,7 @@
 ## Test task for job
 
 Technologies:
+- Java 17
 - Spring Boot
 - Hibernate
 - PostgreSQL
